@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx -y create-vite@latest:*)",
+      "Bash(del:*)"
+    ]
+  }
+}

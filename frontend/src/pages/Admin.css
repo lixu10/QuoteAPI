@@ -1,0 +1,32 @@
+.admin {
+  padding: 40px 0;
+  min-height: calc(100vh - 64px);
+}
+
+.admin h1 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 40px;
+}
+
+.users-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table th,
+.users-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.users-table th {
+  font-weight: 600;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.users-table td {
+  font-size: 15px;
+}
