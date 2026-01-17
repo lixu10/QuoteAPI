@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { repositoryApi, quoteApi, apiService } from '../api';
+import { useAuth } from '../AuthContext';
+import RepositoryStats from '../components/RepositoryStats';
 import './RepositoryDetail.css';
 
 const RepositoryDetail = () => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [repo, setRepo] = useState(null);
   const [quotes, setQuotes] = useState([]);
   const [stats, setStats] = useState(null);
@@ -12,6 +15,7 @@ const RepositoryDetail = () => {
   const [bulkImport, setBulkImport] = useState('');
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -27,6 +31,11 @@ const RepositoryDetail = () => {
       setRepo(repoRes.data);
       setQuotes(quotesRes.data);
       setStats(statsRes.data);
+
+      // 检查当前用户是否是仓库的创建者
+      if (user && repoRes.data.user_id === user.id) {
+        setIsOwner(true);
+      }
     } catch (err) {
       alert('加载失败');
     } finally {
@@ -197,6 +206,9 @@ const RepositoryDetail = () => {
             </table>
           </div>
         )}
+
+        {/* 详细统计数据 - 只有仓库创建者可见 */}
+        {isOwner && <RepositoryStats repositoryId={id} />}
       </div>
     </div>
   );

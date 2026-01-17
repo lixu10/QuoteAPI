@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import repositoryRoutes from './routes/repositories.js';
 import quoteRoutes from './routes/quotes.js';
 import apiRoutes from './routes/api.js';
+import statsRoutes from './routes/stats.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 async function startServer() {
@@ -24,6 +25,7 @@ async function startServer() {
     app.use('/repositories', repositoryRoutes);
     app.use('/quotes', quoteRoutes);
     app.use('/api', apiRoutes);
+    app.use('/stats', statsRoutes);
 
     app.get('/health', (req, res) => {
       res.json({ status: 'ok' });

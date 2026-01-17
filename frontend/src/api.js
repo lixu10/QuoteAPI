@@ -58,4 +58,8 @@ export const apiService = {
   getStats: (repoId) => api.get(`/api/stats/${repoId}`)
 };
 
+export const statsApi = {
+  getRepositoryStats: (repoId) => api.get(`/stats/repository/${repoId}`)
+};
+
 export default api;

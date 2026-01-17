@@ -69,6 +69,8 @@ class DatabaseManager {
       CREATE INDEX IF NOT EXISTS idx_repos_user ON repositories(user_id);
       CREATE INDEX IF NOT EXISTS idx_quotes_repo ON quotes(repository_id);
       CREATE INDEX IF NOT EXISTS idx_logs_repo ON access_logs(repository_id);
+      CREATE INDEX IF NOT EXISTS idx_logs_ip ON access_logs(ip_address);
+      CREATE INDEX IF NOT EXISTS idx_logs_time ON access_logs(accessed_at);
     `);
   }
 
