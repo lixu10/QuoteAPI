@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Repositories from './pages/Repositories';
 import RepositoryDetail from './pages/RepositoryDetail';
+import QuoteDetail from './pages/QuoteDetail';
 import Admin from './pages/Admin';
 import ApiDocs from './pages/ApiDocs';
 import ChangePassword from './pages/ChangePassword';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/endpoints/new" element={<PrivateRoute><EndpointEditor /></PrivateRoute>} />
           <Route path="/endpoints/edit/:id" element={<PrivateRoute><EndpointEditor /></PrivateRoute>} />
           <Route path="/repository/:id" element={<RepositoryDetail />} />
+          <Route path="/quote/:id" element={<QuoteDetail />} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         </Routes>
       </BrowserRouter>

@@ -229,7 +229,7 @@ ${Object.entries(context).map(([key, value]) => {
 
 # 辅助函数库
 def get_random_quote(repo_name):
-    """从指定仓库获取随机语句"""
+    """从指定仓库获取随机语句，返回包含content和link的字典"""
     try:
         url = f'http://localhost:3077/api/random/{urllib.parse.quote(repo_name)}'
         # 创建请求并添加真实客户端IP到头部
@@ -241,9 +241,12 @@ def get_random_quote(repo_name):
 
         with urllib.request.urlopen(req, timeout=3) as response:
             data = json.loads(response.read().decode('utf-8'))
-            return data.get('content', '')
+            return {
+                'content': data.get('content', ''),
+                'link': data.get('link', '')
+            }
     except Exception as e:
-        return f'Error: {str(e)}'
+        return {'content': f'Error: {str(e)}', 'link': ''}
 
 def random_int(min_val=0, max_val=100):
     """生成随机整数"""
