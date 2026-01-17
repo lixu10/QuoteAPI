@@ -62,4 +62,14 @@ export const statsApi = {
   getRepositoryStats: (repoId) => api.get(`/stats/repository/${repoId}`)
 };
 
+export const endpointApi = {
+  getAll: () => api.get('/endpoints'),
+  getById: (id) => api.get(`/endpoints/${id}`),
+  create: (data) => api.post('/endpoints', data),
+  update: (id, data) => api.put(`/endpoints/${id}`, data),
+  delete: (id) => api.delete(`/endpoints/${id}`),
+  toggle: (id) => api.post(`/endpoints/${id}/toggle`),
+  run: (name) => api.get(`/endpoints/run/${name}`)
+};
+
 export default api;

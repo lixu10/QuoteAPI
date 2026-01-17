@@ -1,0 +1,337 @@
+import { Endpoint } from '../models/Endpoint.js';
+import { Repository } from '../models/Repository.js';
+import { Quote } from '../models/Quote.js';
+import { spawn } from 'child_process';
+import { writeFileSync, unlinkSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
+
+export class EndpointService {
+  constructor() {
+    this.endpointModel = new Endpoint();
+    this.repoModel = new Repository();
+    this.quoteModel = new Quote();
+  }
+
+  getUserEndpoints(userId) {
+    return this.endpointModel.findByUserId(userId);
+  }
+
+  getEndpoint(id) {
+    return this.endpointModel.findById(id);
+  }
+
+  createEndpoint(name, userId, description, code) {
+    const existing = this.endpointModel.findByName(name);
+    if (existing) {
+      throw new Error('端口名称已存在');
+    }
+
+    return this.endpointModel.createEndpoint(name, userId, description, code);
+  }
+
+  updateEndpoint(id, userId, data) {
+    const endpoint = this.endpointModel.findById(id);
+    if (!endpoint) {
+      throw new Error('端口不存在');
+    }
+
+    if (endpoint.user_id !== userId) {
+      throw new Error('无权修改此端口');
+    }
+
+    // 检查名称冲突
+    if (data.name && data.name !== endpoint.name) {
+      const existing = this.endpointModel.findByName(data.name);
+      if (existing) {
+        throw new Error('端口名称已存在');
+      }
+    }
+
+    return this.endpointModel.updateEndpoint(id, data);
+  }
+
+  deleteEndpoint(id, userId) {
+    const endpoint = this.endpointModel.findById(id);
+    if (!endpoint) {
+      throw new Error('端口不存在');
+    }
+
+    if (endpoint.user_id !== userId) {
+      throw new Error('无权删除此端口');
+    }
+
+    return this.endpointModel.delete(id);
+  }
+
+  toggleEndpoint(id, userId) {
+    const endpoint = this.endpointModel.findById(id);
+    if (!endpoint) {
+      throw new Error('端口不存在');
+    }
+
+    if (endpoint.user_id !== userId) {
+      throw new Error('无权操作此端口');
+    }
+
+    return this.endpointModel.toggleActive(id);
+  }
+
+  // 执行端口代码
+  async executeEndpoint(name, requestData) {
+    const endpoint = this.endpointModel.findByName(name);
+
+    if (!endpoint) {
+      throw new Error('端口不存在');
+    }
+
+    if (!endpoint.is_active) {
+      throw new Error('端口已禁用');
+    }
+
+    // 增加调用计数
+    this.endpointModel.incrementCallCount(endpoint.id);
+
+    // 准备执行环境
+    const context = this.buildContext(requestData);
+    const result = await this.runPythonCode(endpoint.code, context);
+
+    return result;
+  }
+
+  // 构建执行上下文
+  buildContext(requestData) {
+    const now = new Date();
+
+    return {
+      // 时间相关
+      current_date: now.toISOString().split('T')[0],
+      current_time: now.toTimeString().split(' ')[0],
+      current_datetime: now.toISOString(),
+      current_timestamp: now.getTime(),
+      current_year: now.getFullYear(),
+      current_month: now.getMonth() + 1,
+      current_day: now.getDate(),
+      current_hour: now.getHours(),
+      current_minute: now.getMinutes(),
+      current_second: now.getSeconds(),
+      current_weekday: now.getDay(), // 0-6, 0=Sunday
+      current_weekday_name: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()],
+      current_weekday_cn: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()],
+      is_weekend: now.getDay() === 0 || now.getDay() === 6,
+      is_weekday: now.getDay() >= 1 && now.getDay() <= 5,
+
+      // 请求相关
+      ip_address: requestData.ip || '',
+      user_agent: requestData.userAgent || '',
+      referer: requestData.referer || '',
+
+      // 随机数相关（通过Python的random模块）
+      // 这些会在Python代码中实现
+    };
+  }
+
+  // 运行Python代码（沙箱环境）
+  async runPythonCode(userCode, context) {
+    return new Promise((resolve, reject) => {
+      // 构建完整的Python代码
+      const fullCode = this.buildPythonScript(userCode, context);
+
+      // 创建临时文件
+      const tempFile = join(tmpdir(), `endpoint_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.py`);
+
+      try {
+        writeFileSync(tempFile, fullCode, 'utf8');
+
+        // 执行Python代码
+        const python = spawn('python3', [tempFile], {
+          timeout: 5000, // 5秒超时
+          env: { ...process.env, PYTHONPATH: '' }
+        });
+
+        let stdout = '';
+        let stderr = '';
+
+        python.stdout.on('data', (data) => {
+          stdout += data.toString();
+        });
+
+        python.stderr.on('data', (data) => {
+          stderr += data.toString();
+        });
+
+        python.on('close', (code) => {
+          // 删除临时文件
+          try {
+            unlinkSync(tempFile);
+          } catch (e) {
+            // 忽略删除错误
+          }
+
+          if (code !== 0) {
+            reject(new Error(stderr || '代码执行失败'));
+          } else {
+            try {
+              const result = JSON.parse(stdout.trim());
+              resolve(result);
+            } catch (e) {
+              reject(new Error('返回值格式错误，必须返回有效的JSON'));
+            }
+          }
+        });
+
+        python.on('error', (err) => {
+          try {
+            unlinkSync(tempFile);
+          } catch (e) {
+            // 忽略
+          }
+          reject(new Error('Python执行错误: ' + err.message));
+        });
+
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  // 构建完整的Python脚本
+  buildPythonScript(userCode, context) {
+    return `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import json
+import random
+import hashlib
+import base64
+from datetime import datetime, timedelta
+import urllib.request
+import urllib.parse
+
+# 上下文变量
+${Object.entries(context).map(([key, value]) => {
+  if (typeof value === 'string') {
+    return `${key} = ${JSON.stringify(value)}`;
+  } else if (typeof value === 'boolean') {
+    return `${key} = ${value ? 'True' : 'False'}`;
+  } else {
+    return `${key} = ${value}`;
+  }
+}).join('\n')}
+
+# 辅助函数库
+def get_random_quote(repo_name):
+    """从指定仓库获取随机语句"""
+    try:
+        url = f'http://localhost:3077/api/random/{urllib.parse.quote(repo_name)}'
+        with urllib.request.urlopen(url, timeout=3) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            return data.get('content', '')
+    except Exception as e:
+        return f'Error: {str(e)}'
+
+def random_int(min_val=0, max_val=100):
+    """生成随机整数"""
+    return random.randint(min_val, max_val)
+
+def random_float(min_val=0.0, max_val=1.0):
+    """生成随机浮点数"""
+    return random.uniform(min_val, max_val)
+
+def random_choice(items):
+    """从列表中随机选择一项"""
+    return random.choice(items)
+
+def shuffle_list(items):
+    """打乱列表顺序"""
+    shuffled = items.copy()
+    random.shuffle(shuffled)
+    return shuffled
+
+def md5(text):
+    """计算MD5哈希"""
+    return hashlib.md5(text.encode()).hexdigest()
+
+def sha256(text):
+    """计算SHA256哈希"""
+    return hashlib.sha256(text.encode()).hexdigest()
+
+def base64_encode(text):
+    """Base64编码"""
+    return base64.b64encode(text.encode()).decode()
+
+def base64_decode(text):
+    """Base64解码"""
+    return base64.b64decode(text.encode()).decode()
+
+def format_date(date_str, format='%Y-%m-%d'):
+    """格式化日期"""
+    dt = datetime.fromisoformat(date_str)
+    return dt.strftime(format)
+
+def add_days(date_str, days):
+    """日期加天数"""
+    dt = datetime.fromisoformat(date_str)
+    new_dt = dt + timedelta(days=days)
+    return new_dt.isoformat()
+
+def get_season():
+    """获取当前季节"""
+    month = current_month
+    if month in [3, 4, 5]:
+        return '春季'
+    elif month in [6, 7, 8]:
+        return '夏季'
+    elif month in [9, 10, 11]:
+        return '秋季'
+    else:
+        return '冬季'
+
+def is_holiday():
+    """判断是否是节假日（示例：仅判断一些固定节日）"""
+    month_day = f'{current_month:02d}-{current_day:02d}'
+    holidays = ['01-01', '05-01', '10-01', '12-25']
+    return month_day in holidays
+
+def chinese_zodiac():
+    """获取生肖"""
+    zodiacs = ['猴', '鸡', '狗', '猪', '鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊']
+    return zodiacs[current_year % 12]
+
+def days_until_weekend():
+    """距离周末还有几天"""
+    if current_weekday == 0:  # Sunday
+        return 6
+    elif current_weekday == 6:  # Saturday
+        return 0
+    else:
+        return 6 - current_weekday
+
+def greeting():
+    """根据时间返回问候语"""
+    hour = current_hour
+    if 5 <= hour < 12:
+        return '早上好'
+    elif 12 <= hour < 14:
+        return '中午好'
+    elif 14 <= hour < 18:
+        return '下午好'
+    elif 18 <= hour < 22:
+        return '晚上好'
+    else:
+        return '夜深了'
+
+# 用户代码
+try:
+    ${userCode}
+
+    # 确保用户代码返回了result
+    if 'result' not in locals():
+        result = {'error': '代码必须定义result变量'}
+
+    # 输出JSON结果
+    print(json.dumps(result, ensure_ascii=False))
+except Exception as e:
+    print(json.dumps({'error': str(e)}, ensure_ascii=False))
+`;
+  }
+}

@@ -66,11 +66,26 @@ class DatabaseManager {
         FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE SET NULL
       );
 
+      CREATE TABLE IF NOT EXISTS endpoints (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        user_id INTEGER NOT NULL,
+        description TEXT,
+        code TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        call_count INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+
       CREATE INDEX IF NOT EXISTS idx_repos_user ON repositories(user_id);
       CREATE INDEX IF NOT EXISTS idx_quotes_repo ON quotes(repository_id);
       CREATE INDEX IF NOT EXISTS idx_logs_repo ON access_logs(repository_id);
       CREATE INDEX IF NOT EXISTS idx_logs_ip ON access_logs(ip_address);
       CREATE INDEX IF NOT EXISTS idx_logs_time ON access_logs(accessed_at);
+      CREATE INDEX IF NOT EXISTS idx_endpoints_user ON endpoints(user_id);
+      CREATE INDEX IF NOT EXISTS idx_endpoints_name ON endpoints(name);
     `);
   }
 

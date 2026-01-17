@@ -1,0 +1,265 @@
+.endpoint-editor-page {
+  padding: 40px 0;
+  min-height: calc(100vh - 80px);
+}
+
+.container-fluid {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.editor-header h1 {
+  font-size: 2rem;
+}
+
+.editor-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+}
+
+.editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section, .code-section {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.code-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.code-editor {
+  width: 100%;
+  padding: 16px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background-color: #f8f9fa;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 400px;
+}
+
+.code-editor:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.code-tips {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.code-tips strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.code-tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.code-tips li {
+  margin: 4px 0;
+}
+
+.code-tips code {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.editor-sidebar {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  background-color: #f8f9fa;
+}
+
+.sidebar-tabs .tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.sidebar-tabs .tab:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-tabs .tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background-color: white;
+}
+
+.functions-list, .examples-list {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.function-category {
+  margin-bottom: 24px;
+}
+
+.function-category:last-child {
+  margin-bottom: 0;
+}
+
+.function-category h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.function-item {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.function-item:hover {
+  background-color: #e9ecef;
+}
+
+.function-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.function-header code {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.btn-insert {
+  padding: 4px 12px;
+  font-size: 12px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-insert:hover {
+  background-color: var(--primary-dark);
+}
+
+.function-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.examples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.example-item {
+  padding: 16px;
+}
+
+.example-item h4 {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.example-code {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 1200px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-sidebar {
+    max-height: 500px;
+  }
+}

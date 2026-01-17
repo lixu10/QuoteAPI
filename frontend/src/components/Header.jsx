@@ -17,6 +17,7 @@ const Header = () => {
             {user ? (
               <>
                 <Link to="/dashboard" className="nav-link">我的仓库</Link>
+                <Link to="/endpoints" className="nav-link">我的端口</Link>
                 {!!user.isAdmin && <Link to="/admin" className="nav-link">用户管理</Link>}
                 <Link to="/change-password" className="nav-link">修改密码</Link>
                 <span className="user-name">{user.username}</span>

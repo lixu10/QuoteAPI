@@ -11,6 +11,8 @@ import RepositoryDetail from './pages/RepositoryDetail';
 import Admin from './pages/Admin';
 import ApiDocs from './pages/ApiDocs';
 import ChangePassword from './pages/ChangePassword';
+import Endpoints from './pages/Endpoints';
+import EndpointEditor from './pages/EndpointEditor';
 import './index.css';
 
 const PrivateRoute = ({ children }) => {
@@ -38,6 +40,9 @@ function App() {
           <Route path="/api-docs" element={<ApiDocs />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/change-password" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
+          <Route path="/endpoints" element={<PrivateRoute><Endpoints /></PrivateRoute>} />
+          <Route path="/endpoints/new" element={<PrivateRoute><EndpointEditor /></PrivateRoute>} />
+          <Route path="/endpoints/edit/:id" element={<PrivateRoute><EndpointEditor /></PrivateRoute>} />
           <Route path="/repository/:id" element={<RepositoryDetail />} />
           <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         </Routes>

@@ -7,6 +7,7 @@ import repositoryRoutes from './routes/repositories.js';
 import quoteRoutes from './routes/quotes.js';
 import apiRoutes from './routes/api.js';
 import statsRoutes from './routes/stats.js';
+import endpointRoutes from './routes/endpoints.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
 async function startServer() {
@@ -26,6 +27,7 @@ async function startServer() {
     app.use('/quotes', quoteRoutes);
     app.use('/api', apiRoutes);
     app.use('/stats', statsRoutes);
+    app.use('/endpoints', endpointRoutes);
 
     app.get('/health', (req, res) => {
       res.json({ status: 'ok' });
