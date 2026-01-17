@@ -232,7 +232,14 @@ def get_random_quote(repo_name):
     """从指定仓库获取随机语句"""
     try:
         url = f'http://localhost:3077/api/random/{urllib.parse.quote(repo_name)}'
-        with urllib.request.urlopen(url, timeout=3) as response:
+        # 创建请求并添加真实客户端IP到头部
+        req = urllib.request.Request(url)
+        req.add_header('X-Forwarded-For', ip_address)
+        req.add_header('User-Agent', user_agent)
+        if referer:
+            req.add_header('Referer', referer)
+
+        with urllib.request.urlopen(req, timeout=3) as response:
             data = json.loads(response.read().decode('utf-8'))
             return data.get('content', '')
     except Exception as e:
