@@ -131,6 +131,11 @@ export class EndpointService {
     };
   }
 
+  // 获取Python命令（Windows使用python，Linux/Mac使用python3）
+  getPythonCommand() {
+    return process.platform === 'win32' ? 'python' : 'python3';
+  }
+
   // 运行Python代码（沙箱环境）
   async runPythonCode(userCode, context) {
     return new Promise((resolve, reject) => {
@@ -143,8 +148,9 @@ export class EndpointService {
       try {
         writeFileSync(tempFile, fullCode, 'utf8');
 
-        // 执行Python代码
-        const python = spawn('python3', [tempFile], {
+        // 执行Python代码（根据系统选择命令）
+        const pythonCmd = this.getPythonCommand();
+        const python = spawn(pythonCmd, [tempFile], {
           timeout: 5000, // 5秒超时
           env: { ...process.env, PYTHONPATH: '' }
         });
@@ -197,6 +203,9 @@ export class EndpointService {
 
   // 构建完整的Python脚本
   buildPythonScript(userCode, context) {
+    // 给用户代码添加缩进（4个空格）
+    const indentedUserCode = userCode.split('\n').map(line => '    ' + line).join('\n');
+
     return `#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json
@@ -322,7 +331,7 @@ def greeting():
 
 # 用户代码
 try:
-    ${userCode}
+${indentedUserCode}
 
     # 确保用户代码返回了result
     if 'result' not in locals():

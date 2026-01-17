@@ -1,6 +1,7 @@
 import express from 'express';
 import { EndpointService } from '../services/EndpointService.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { getClientIp } from '../utils/getClientIp.js';
 
 const router = express.Router();
 const endpointService = new EndpointService();
@@ -91,7 +92,7 @@ router.post('/:id/toggle', authMiddleware, (req, res, next) => {
 router.get('/run/:name', async (req, res, next) => {
   try {
     const requestData = {
-      ip: req.ip || req.connection.remoteAddress,
+      ip: getClientIp(req),
       userAgent: req.headers['user-agent'],
       referer: req.headers.referer || req.headers.referrer
     };

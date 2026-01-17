@@ -1,5 +1,6 @@
 import express from 'express';
 import { ApiService } from '../services/ApiService.js';
+import { getClientIp } from '../utils/getClientIp.js';
 
 const router = express.Router();
 const apiService = new ApiService();
@@ -7,7 +8,7 @@ const apiService = new ApiService();
 router.get('/random/:repoName', (req, res, next) => {
   try {
     const referer = req.headers.referer || req.headers.referrer;
-    const ipAddress = req.ip || req.connection.remoteAddress;
+    const ipAddress = getClientIp(req);
     const userAgent = req.headers['user-agent'];
 
     const result = apiService.getRandomQuote(
@@ -24,7 +25,7 @@ router.get('/random/:repoName', (req, res, next) => {
 
 router.get('/quote/:id', (req, res, next) => {
   try {
-    const ipAddress = req.ip || req.connection.remoteAddress;
+    const ipAddress = getClientIp(req);
     const userAgent = req.headers['user-agent'];
 
     const quote = apiService.getQuoteDetails(
