@@ -12,7 +12,7 @@
 docker-compose up -d
 ```
 
-4. 等待构建完成后，访问 `http://localhost`
+4. 等待构建完成后，访问 `http://localhost:3088`
 
 5. 使用默认管理员账号登录：
    - 用户名：`admin`
@@ -28,7 +28,7 @@ docker-compose up -d
 
 ### 3. 使用API
 ```bash
-curl http://localhost/api/random/你的仓库名
+curl http://localhost:3088/api/random/你的仓库名
 ```
 
 返回：

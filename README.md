@@ -57,7 +57,7 @@ docker-compose up -d
 
 4. 访问应用
 
-打开浏览器访问 `http://localhost`
+打开浏览器访问 `http://localhost:3088`
 
 默认管理员账号：
 - 用户名：`admin`
@@ -132,7 +132,7 @@ GET /api/random/{仓库名}
 
 ```javascript
 // JavaScript
-fetch('http://localhost/api/random/诗词')
+fetch('http://localhost:3088/api/random/诗词')
   .then(res => res.json())
   .then(data => console.log(data.content));
 ```
@@ -140,7 +140,7 @@ fetch('http://localhost/api/random/诗词')
 ```python
 # Python
 import requests
-response = requests.get('http://localhost/api/random/诗词')
+response = requests.get('http://localhost:3088/api/random/诗词')
 data = response.json()
 print(data['content'])
 ```

@@ -19,7 +19,7 @@ services:
     build: ./frontend
     container_name: quoteapi-frontend
     ports:
-      - "80:80"
+      - "3088:80"
     depends_on:
       - backend
     restart: unless-stopped

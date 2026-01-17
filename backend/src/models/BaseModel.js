@@ -3,7 +3,10 @@ import dbManager from '../config/database.js';
 export class BaseModel {
   constructor(tableName) {
     this.tableName = tableName;
-    this.db = dbManager.getDb();
+  }
+
+  get db() {
+    return dbManager.getDb();
   }
 
   findById(id) {
