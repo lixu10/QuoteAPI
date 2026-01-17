@@ -529,6 +529,138 @@ end`
         </section>
 
         <section className="docs-section">
+          <h2>获取语句详情页链接</h2>
+          <p className="section-desc">
+            API返回的<code>link</code>字段包含该语句的详情页面链接，您可以将其用作"查看详情"或"阅读更多"的跳转地址。
+          </p>
+
+          <div className="card">
+            <h3>响应示例</h3>
+            <pre className="code-block">{`{
+  "content": "床前明月光，疑是地上霜。",
+  "link": "${baseUrl}/repository/1"
+}`}</pre>
+          </div>
+
+          <div className="example-card card">
+            <div className="example-header">
+              <h3>在HTML中使用link字段</h3>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => copyToClipboard(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>每日一句</title>
+    <style>
+        .quote-box {
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        #quote {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #333;
+            white-space: pre-wrap;
+        }
+        .detail-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .detail-link:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="quote-box">
+        <div id="quote">加载中...</div>
+        <a id="detailLink" href="#" class="detail-link" target="_blank">查看详情</a>
+    </div>
+
+    <script>
+        fetch('${baseUrl}/api/random/${selectedRepo}')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('quote').textContent = data.content;
+                document.getElementById('detailLink').href = data.link;
+            })
+            .catch(error => {
+                document.getElementById('quote').textContent = '加载失败';
+            });
+    </script>
+</body>
+</html>`)}
+              >
+                复制代码
+              </button>
+            </div>
+            <pre className="code-block">{`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>每日一句</title>
+    <style>
+        .quote-box {
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        #quote {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #333;
+            white-space: pre-wrap;
+        }
+        .detail-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .detail-link:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="quote-box">
+        <div id="quote">加载中...</div>
+        <a id="detailLink" href="#" class="detail-link" target="_blank">查看详情</a>
+    </div>
+
+    <script>
+        fetch('${baseUrl}/api/random/${selectedRepo}')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('quote').textContent = data.content;
+                document.getElementById('detailLink').href = data.link;
+            })
+            .catch(error => {
+                document.getElementById('quote').textContent = '加载失败';
+            });
+    </script>
+</body>
+</html>`}</pre>
+          </div>
+        </section>
+
+        <section className="docs-section">
           <h2>使用场景</h2>
           <div className="use-cases">
             <div className="use-case-card card">

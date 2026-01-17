@@ -46,4 +46,17 @@ router.delete('/users/:id', authMiddleware, adminMiddleware, async (req, res, ne
   }
 });
 
+router.post('/change-password', authMiddleware, async (req, res, next) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: '旧密码和新密码不能为空' });
+    }
+    const result = await authService.changePassword(req.user.id, oldPassword, newPassword);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

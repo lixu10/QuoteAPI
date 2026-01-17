@@ -54,4 +54,21 @@ export class AuthService {
   deleteUser(id) {
     return this.userModel.deleteUser(id);
   }
+
+  async changePassword(userId, oldPassword, newPassword) {
+    const user = this.userModel.findById(userId);
+    if (!user) {
+      throw new Error('用户不存在');
+    }
+
+    const isValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isValid) {
+      throw new Error('原密码错误');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    this.userModel.update(userId, { password: hashedPassword });
+
+    return { message: '密码修改成功' };
+  }
 }

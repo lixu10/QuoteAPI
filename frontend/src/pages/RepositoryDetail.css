@@ -4,7 +4,7 @@
 }
 
 .repo-info {
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .repo-info h1 {
@@ -14,7 +14,7 @@
 }
 
 .repo-info p {
-  color: var(--secondary);
+  color: var(--text-secondary);
   font-size: 18px;
   margin-bottom: 24px;
 }
@@ -33,7 +33,7 @@
 
 .stat-label {
   font-size: 14px;
-  color: var(--secondary);
+  color: var(--text-secondary);
 }
 
 .stat-value {
@@ -59,47 +59,85 @@
   border-radius: 8px;
   font-family: 'Monaco', 'Courier New', monospace;
   font-size: 14px;
-  color: var(--accent);
+  color: var(--primary);
 }
 
-.section-header {
+.add-quote-section {
+  margin-bottom: 32px;
+}
+
+.add-quote-section h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.add-quote-form {
+  margin-bottom: 20px;
+}
+
+.form-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
-.section-header h2 {
-  font-size: 32px;
-  font-weight: 700;
+.bulk-import-form {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border);
+}
+
+.bulk-import-form h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.bulk-import-form .hint {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.quotes-section {
+  margin-bottom: 40px;
+}
+
+.quotes-section h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
 .quotes-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-bottom: 40px;
 }
 
 .quote-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
+  padding: 20px;
 }
 
 .quote-content {
-  flex: 1;
   font-size: 16px;
   line-height: 1.6;
   white-space: pre-wrap;
+  margin-bottom: 12px;
+}
+
+.quote-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
 
 .quote-stats {
   display: flex;
   gap: 16px;
   font-size: 14px;
-  color: var(--secondary);
+  color: var(--text-secondary);
 }
 
 .btn-sm {

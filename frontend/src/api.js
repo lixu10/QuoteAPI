@@ -31,7 +31,8 @@ export const authApi = {
   login: (username, password) => api.post('/auth/login', { username, password }),
   register: (username, password) => api.post('/auth/register', { username, password }),
   getUsers: () => api.get('/auth/users'),
-  deleteUser: (id) => api.delete(`/auth/users/${id}`)
+  deleteUser: (id) => api.delete(`/auth/users/${id}`),
+  changePassword: (oldPassword, newPassword) => api.post('/auth/change-password', { oldPassword, newPassword })
 };
 
 export const repositoryApi = {
