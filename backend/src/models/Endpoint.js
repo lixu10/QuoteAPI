@@ -27,9 +27,13 @@ export class Endpoint extends BaseModel {
   }
 
   updateEndpoint(id, data) {
+    // 使用东八区时间（UTC+8）
+    const now = new Date();
+    const chinaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
+
     const updateData = {
       ...data,
-      updated_at: new Date().toISOString()
+      updated_at: chinaTime.toISOString()
     };
     return this.update(id, updateData);
   }

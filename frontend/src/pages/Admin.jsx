@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { authApi } from '../api';
+import { formatBeijingDateTime } from '../utils/timeUtils';
 import './Admin.css';
 
 const Admin = () => {
@@ -55,7 +56,7 @@ const Admin = () => {
                   <td>{user.id}</td>
                   <td>{user.username}</td>
                   <td>{user.is_admin ? '是' : '否'}</td>
-                  <td>{new Date(user.created_at).toLocaleString('zh-CN')}</td>
+                  <td>{formatBeijingDateTime(user.created_at)}</td>
                   <td>
                     {user.id !== 1 && (
                       <button onClick={() => handleDelete(user.id)} className="btn btn-danger btn-sm">

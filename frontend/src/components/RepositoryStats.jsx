@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { statsApi } from '../api';
+import { formatBeijingDateTime } from '../utils/timeUtils';
 import './RepositoryStats.css';
 
 const RepositoryStats = ({ repositoryId }) => {
@@ -168,7 +169,7 @@ const RepositoryStats = ({ repositoryId }) => {
                       <td>{index + 1}</td>
                       <td className="monospace">{item.ip_address}</td>
                       <td>{item.count}</td>
-                      <td>{new Date(item.last_access).toLocaleString('zh-CN')}</td>
+                      <td>{formatBeijingDateTime(item.last_access)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -257,7 +258,7 @@ const RepositoryStats = ({ repositoryId }) => {
                   <div key={log.id} className="log-item">
                     <div className="log-header">
                       <span className="log-ip monospace">{log.ip_address || '未知IP'}</span>
-                      <span className="log-time">{new Date(log.accessed_at).toLocaleString('zh-CN')}</span>
+                      <span className="log-time">{formatBeijingDateTime(log.accessed_at)}</span>
                     </div>
                     {log.quote_content && (
                       <div className="log-quote">{log.quote_content.substring(0, 50)}...</div>

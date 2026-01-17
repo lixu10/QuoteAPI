@@ -34,7 +34,7 @@
 
 /* Quote Container */
 .quote-container {
-  max-width: 900px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -81,17 +81,20 @@
 
 .quote-text {
   font-family: 'Noto Serif SC', 'Crimson Text', serif;
-  font-size: clamp(28px, 4vw, 48px);
+  /* 字号由 JavaScript 动态设置 */
   line-height: 1.8;
   color: #1a1a1a;
   font-weight: 400;
   white-space: pre-wrap;
   word-wrap: break-word;
+  word-break: break-word;
   margin: 0;
-  padding: 0 20px;
+  padding: 0 40px;
   position: relative;
   z-index: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  max-width: 100%;
+  transition: font-size 0.3s ease;
 }
 
 /* Quote Meta */
@@ -170,7 +173,7 @@
   }
 
   .quote-text {
-    font-size: clamp(22px, 5vw, 32px);
+    /* 移动端字号也由 JavaScript 动态设置，但会被缩小 */
     line-height: 1.7;
     padding: 0 10px;
   }

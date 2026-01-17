@@ -101,25 +101,27 @@ export class EndpointService {
 
   // 构建执行上下文
   buildContext(requestData) {
+    // 使用东八区时间（UTC+8）
     const now = new Date();
+    const chinaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
 
     return {
-      // 时间相关
-      current_date: now.toISOString().split('T')[0],
-      current_time: now.toTimeString().split(' ')[0],
-      current_datetime: now.toISOString(),
-      current_timestamp: now.getTime(),
-      current_year: now.getFullYear(),
-      current_month: now.getMonth() + 1,
-      current_day: now.getDate(),
-      current_hour: now.getHours(),
-      current_minute: now.getMinutes(),
-      current_second: now.getSeconds(),
-      current_weekday: now.getDay(), // 0-6, 0=Sunday
-      current_weekday_name: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()],
-      current_weekday_cn: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()],
-      is_weekend: now.getDay() === 0 || now.getDay() === 6,
-      is_weekday: now.getDay() >= 1 && now.getDay() <= 5,
+      // 时间相关（东八区）
+      current_date: chinaTime.toISOString().split('T')[0],
+      current_time: chinaTime.toTimeString().split(' ')[0],
+      current_datetime: chinaTime.toISOString(),
+      current_timestamp: chinaTime.getTime(),
+      current_year: chinaTime.getUTCFullYear(),
+      current_month: chinaTime.getUTCMonth() + 1,
+      current_day: chinaTime.getUTCDate(),
+      current_hour: chinaTime.getUTCHours(),
+      current_minute: chinaTime.getUTCMinutes(),
+      current_second: chinaTime.getUTCSeconds(),
+      current_weekday: chinaTime.getUTCDay(), // 0-6, 0=Sunday
+      current_weekday_name: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][chinaTime.getUTCDay()],
+      current_weekday_cn: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][chinaTime.getUTCDay()],
+      is_weekend: chinaTime.getUTCDay() === 0 || chinaTime.getUTCDay() === 6,
+      is_weekday: chinaTime.getUTCDay() >= 1 && chinaTime.getUTCDay() <= 5,
 
       // 请求相关
       ip_address: requestData.ip || '',

@@ -1,79 +1,136 @@
 .repo-detail {
+  min-height: calc(100vh - 80px);
   padding: 40px 0;
-  min-height: calc(100vh - 64px);
+  background: #fafafa;
 }
 
-.repo-info {
-  margin-bottom: 32px;
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-.repo-info h1 {
-  font-size: 40px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.repo-info p {
-  color: var(--text-secondary);
-  font-size: 18px;
+/* 仓库头部 */
+.repo-header {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
   margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.stats-row {
-  display: flex;
-  gap: 40px;
-  margin-bottom: 24px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.stat-value {
-  font-size: 28px;
+.repo-header h1 {
+  font-size: 32px;
   font-weight: 600;
-}
-
-.api-info {
-  margin-top: 24px;
-}
-
-.api-info label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
+  color: #1a1a1a;
   margin-bottom: 8px;
 }
 
-.api-url {
+.repo-description {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.repo-stats {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-box {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #999;
+  letter-spacing: 0.03em;
+}
+
+.api-box label {
   display: block;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.api-url-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.api-url-container code {
+  flex: 1;
+  background: #f5f5f5;
+  padding: 10px 14px;
+  border-radius: 6px;
   font-size: 14px;
-  color: var(--primary);
+  color: #333;
+  font-family: 'Monaco', monospace;
+  overflow-x: auto;
 }
 
-.add-quote-section {
-  margin-bottom: 32px;
+.copy-btn {
+  padding: 10px 16px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.add-quote-section h2 {
-  font-size: 24px;
+.copy-btn:hover {
+  background: #333;
+}
+
+/* 添加语句区域 */
+.add-section {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.add-section h2 {
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 16px;
+  color: #1a1a1a;
 }
 
-.add-quote-form {
-  margin-bottom: 20px;
+.add-section textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 15px;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.add-section textarea:focus {
+  outline: none;
+  border-color: #999;
 }
 
 .form-actions {
@@ -82,90 +139,299 @@
   margin-top: 12px;
 }
 
-.bulk-import-form {
+.btn-add,
+.btn-bulk {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add {
+  background: #1a1a1a;
+  color: white;
+}
+
+.btn-add:hover {
+  background: #333;
+}
+
+.btn-bulk {
+  background: white;
+  color: #1a1a1a;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-bulk:hover {
+  background: #fafafa;
+  border-color: #999;
+}
+
+.bulk-form {
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 2px solid var(--border);
+  border-top: 1px solid #f0f0f0;
 }
 
-.bulk-import-form h3 {
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-
-.bulk-import-form .hint {
-  font-size: 14px;
-  color: var(--text-secondary);
+.bulk-form .hint {
+  font-size: 13px;
+  color: #999;
   margin-bottom: 12px;
 }
 
+/* 语句列表 */
 .quotes-section {
-  margin-bottom: 40px;
+  background: white;
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.quotes-section h2 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-.quotes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.quote-item {
-  padding: 20px;
-}
-
-.quote-content {
-  font-size: 16px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  margin-bottom: 12px;
-}
-
-.quote-footer {
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.quote-stats {
-  display: flex;
-  gap: 16px;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.btn-sm {
-  padding: 8px 16px;
-  font-size: 14px;
-}
-
-.referer-stats {
-  margin-top: 40px;
-}
-
-.referer-stats h3 {
-  font-size: 24px;
-  margin-bottom: 16px;
-}
-
-.referer-stats table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.referer-stats th,
-.referer-stats td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-.referer-stats th {
+.section-header h2 {
+  font-size: 20px;
   font-weight: 600;
+  color: #1a1a1a;
+}
+
+.quote-count {
+  font-size: 14px;
+  color: #999;
+  font-weight: 500;
+}
+
+.quotes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quote-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px 18px;
+  transition: all 0.2s;
+  background: white;
+}
+
+.quote-card:hover {
+  border-color: #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.quote-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.quote-text:hover {
+  color: #666;
+}
+
+.quote-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.quote-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #999;
+  flex-wrap: wrap;
+}
+
+.view-link {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.view-link:hover {
+  color: #1a1a1a;
+  text-decoration: underline;
+}
+
+.delete-btn {
+  padding: 6px 14px;
+  background: none;
+  border: 1px solid #ffebee;
+  color: #e53935;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.delete-btn:hover {
+  background: #ffebee;
+  border-color: #e53935;
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #fafafa;
+  border-color: #999;
+  color: #1a1a1a;
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 6px;
+}
+
+.page-number {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-number:hover {
+  background: #fafafa;
+  border-color: #999;
+  color: #1a1a1a;
+}
+
+.page-number.active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: white;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.empty-state p {
+  font-size: 15px;
+}
+
+/* 加载和错误状态 */
+.loading,
+.error {
+  text-align: center;
+  padding: 80px 20px;
+  font-size: 16px;
+  color: #999;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .repo-detail {
+    padding: 20px 0;
+  }
+
+  .repo-header {
+    padding: 24px 20px;
+  }
+
+  .repo-header h1 {
+    font-size: 24px;
+  }
+
+  .repo-stats {
+    gap: 24px;
+  }
+
+  .stat-number {
+    font-size: 24px;
+  }
+
+  .api-url-container {
+    flex-direction: column;
+  }
+
+  .api-url-container code {
+    font-size: 12px;
+  }
+
+  .copy-btn {
+    width: 100%;
+  }
+
+  .add-section,
+  .quotes-section {
+    padding: 20px 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-add,
+  .btn-bulk {
+    width: 100%;
+  }
+
+  .quote-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .delete-btn {
+    width: 100%;
+  }
+
+  .page-numbers {
+    overflow-x: auto;
+    max-width: 100%;
+  }
 }

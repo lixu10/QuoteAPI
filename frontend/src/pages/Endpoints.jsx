@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { endpointApi } from '../api';
+import { formatBeijingDate } from '../utils/timeUtils';
 import './Endpoints.css';
 
 const Endpoints = () => {
@@ -97,7 +98,7 @@ const Endpoints = () => {
                   <div className="stat">
                     <span className="stat-label">创建时间</span>
                     <span className="stat-value">
-                      {new Date(endpoint.created_at).toLocaleDateString('zh-CN')}
+                      {formatBeijingDate(endpoint.created_at)}
                     </span>
                   </div>
                 </div>

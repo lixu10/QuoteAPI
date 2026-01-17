@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { repositoryApi, quoteApi, apiService } from '../api';
 import { useAuth } from '../AuthContext';
 import RepositoryStats from '../components/RepositoryStats';
 import './RepositoryDetail.css';
 
+const QUOTES_PER_PAGE = 10;
+
 const RepositoryDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [repo, setRepo] = useState(null);
   const [quotes, setQuotes] = useState([]);
@@ -16,6 +19,7 @@ const RepositoryDetail = () => {
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     loadData();
@@ -32,7 +36,6 @@ const RepositoryDetail = () => {
       setQuotes(quotesRes.data);
       setStats(statsRes.data);
 
-      // 检查当前用户是否是仓库的创建者
       if (user && repoRes.data.user_id === user.id) {
         setIsOwner(true);
       }
@@ -95,119 +98,176 @@ const RepositoryDetail = () => {
 
   const apiUrl = `${window.location.origin}/api/random/${repo.name}`;
 
+  // 分页逻辑
+  const totalPages = Math.ceil(quotes.length / QUOTES_PER_PAGE);
+  const startIndex = (currentPage - 1) * QUOTES_PER_PAGE;
+  const endIndex = startIndex + QUOTES_PER_PAGE;
+  const currentQuotes = quotes.slice(startIndex, endIndex);
+
+  const goToPage = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="repo-detail">
       <div className="container">
-        <div className="repo-info card">
+        <div className="repo-header">
           <h1>{repo.name}</h1>
-          <p>{repo.description}</p>
-          <div className="stats-row">
-            <div className="stat-item">
-              <span className="stat-label">语句数量</span>
-              <span className="stat-value">{repo.quote_count || 0}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">API调用</span>
-              <span className="stat-value">{repo.api_calls}</span>
-            </div>
-          </div>
-          <div className="api-info">
-            <label>API地址</label>
-            <code className="api-url">{apiUrl}</code>
-          </div>
-        </div>
+          <p className="repo-description">{repo.description}</p>
 
-        <div className="add-quote-section card">
-          <h2>添加语句</h2>
-          <form onSubmit={handleAddQuote} className="add-quote-form">
-            <textarea
-              className="textarea"
-              value={newQuote}
-              onChange={(e) => setNewQuote(e.target.value)}
-              placeholder="输入语句内容，支持换行"
-              rows={4}
-            />
-            <div className="form-actions">
-              <button type="submit" className="btn btn-primary">
-                添加语句
-              </button>
+          <div className="repo-stats">
+            <div className="stat-box">
+              <div className="stat-number">{repo.quote_count || 0}</div>
+              <div className="stat-label">语句数量</div>
+            </div>
+            <div className="stat-box">
+              <div className="stat-number">{repo.api_calls}</div>
+              <div className="stat-label">API调用</div>
+            </div>
+          </div>
+
+          <div className="api-box">
+            <label>API 调用地址</label>
+            <div className="api-url-container">
+              <code>{apiUrl}</code>
               <button
-                type="button"
-                onClick={() => setShowBulkImport(!showBulkImport)}
-                className="btn btn-secondary"
+                onClick={() => navigator.clipboard.writeText(apiUrl)}
+                className="copy-btn"
               >
-                {showBulkImport ? '关闭批量导入' : '批量导入'}
+                复制
               </button>
             </div>
-          </form>
-
-          {showBulkImport && (
-            <form onSubmit={handleBulkImport} className="bulk-import-form">
-              <h3>批量导入</h3>
-              <p className="hint">每行一条语句，不支持换行（如需换行请单独添加）</p>
-              <textarea
-                className="textarea"
-                value={bulkImport}
-                onChange={(e) => setBulkImport(e.target.value)}
-                placeholder="每行输入一条语句"
-                rows={8}
-              />
-              <button type="submit" className="btn btn-primary">
-                确认导入
-              </button>
-            </form>
-          )}
-        </div>
-
-        <div className="quotes-section">
-          <h2>语句列表 ({quotes.length})</h2>
-          <div className="quotes-list">
-            {quotes.map((quote) => (
-              <div key={quote.id} className="quote-item card">
-                <p className="quote-content">{quote.content}</p>
-                <div className="quote-footer">
-                  <div className="quote-stats">
-                    <span>使用 {quote.usage_count} 次</span>
-                    <span>访问 {quote.page_views} 次</span>
-                  </div>
-                  <button onClick={() => handleDeleteQuote(quote.id)} className="btn btn-danger btn-sm">
-                    删除
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
-
-          {quotes.length === 0 && (
-            <div className="empty-state">
-              <p>还没有语句，使用上方表单添加第一条语句</p>
-            </div>
-          )}
         </div>
 
-        {stats?.refererStats && stats.refererStats.length > 0 && (
-          <div className="referer-stats card">
-            <h3>来源统计</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>来源</th>
-                  <th>访问次数</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.refererStats.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.referer || '直接访问'}</td>
-                    <td>{item.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {isOwner && (
+          <div className="add-section">
+            <h2>添加语句</h2>
+            <form onSubmit={handleAddQuote}>
+              <textarea
+                value={newQuote}
+                onChange={(e) => setNewQuote(e.target.value)}
+                placeholder="输入语句内容，支持换行..."
+                rows={3}
+              />
+              <div className="form-actions">
+                <button type="submit" className="btn-add">
+                  添加语句
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowBulkImport(!showBulkImport)}
+                  className="btn-bulk"
+                >
+                  {showBulkImport ? '取消批量导入' : '批量导入'}
+                </button>
+              </div>
+            </form>
+
+            {showBulkImport && (
+              <form onSubmit={handleBulkImport} className="bulk-form">
+                <p className="hint">每行一条语句（不支持单条换行，如需换行请单独添加）</p>
+                <textarea
+                  value={bulkImport}
+                  onChange={(e) => setBulkImport(e.target.value)}
+                  placeholder="每行输入一条语句..."
+                  rows={6}
+                />
+                <button type="submit" className="btn-add">
+                  确认导入
+                </button>
+              </form>
+            )}
           </div>
         )}
 
-        {/* 详细统计数据 - 只有仓库创建者可见 */}
+        <div className="quotes-section">
+          <div className="section-header">
+            <h2>语句列表</h2>
+            <span className="quote-count">{quotes.length} 条</span>
+          </div>
+
+          {currentQuotes.length > 0 ? (
+            <>
+              <div className="quotes-grid">
+                {currentQuotes.map((quote) => (
+                  <div key={quote.id} className="quote-card">
+                    <div
+                      className="quote-text"
+                      onClick={() => navigate(`/quote/${quote.id}`)}
+                    >
+                      {quote.content}
+                    </div>
+                    <div className="quote-meta">
+                      <div className="quote-info">
+                        <span>使用 {quote.usage_count || 0} 次</span>
+                        <span>•</span>
+                        <span>访问 {quote.page_views || 0} 次</span>
+                        <span>•</span>
+                        <a
+                          href={`/quote/${quote.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate(`/quote/${quote.id}`);
+                          }}
+                          className="view-link"
+                        >
+                          查看详情
+                        </a>
+                      </div>
+                      {isOwner && (
+                        <button
+                          onClick={() => handleDeleteQuote(quote.id)}
+                          className="delete-btn"
+                        >
+                          删除
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="pagination">
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="page-btn"
+                  >
+                    上一页
+                  </button>
+
+                  <div className="page-numbers">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={`page-number ${currentPage === page ? 'active' : ''}`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="page-btn"
+                  >
+                    下一页
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="empty-state">
+              <p>还没有语句，{isOwner ? '使用上方表单添加第一条语句' : '敬请期待'}</p>
+            </div>
+          )}
+        </div>
+
         {isOwner && <RepositoryStats repositoryId={id} />}
       </div>
     </div>
