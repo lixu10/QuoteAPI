@@ -2,23 +2,244 @@
   min-height: calc(100vh - 64px);
 }
 
-.hero {
-  padding: 120px 0 80px;
+/* =====================================================
+   首页语句展示区域 - 白灰高级简约风格
+   ===================================================== */
+
+.showcase-section {
+  padding: 80px 0 60px;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.showcase-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(0, 0, 0, 0.015) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.showcase-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.showcase-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  padding: 56px 64px;
+  position: relative;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    0 12px 48px rgba(0, 0, 0, 0.03);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.showcase-card.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.showcase-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08), transparent);
+}
+
+.showcase-quote-mark {
+  position: absolute;
+  top: 24px;
+  left: 40px;
+  font-size: 100px;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: rgba(0, 0, 0, 0.04);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+.showcase-content {
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.9;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
   text-align: center;
+  letter-spacing: 0.3px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  position: relative;
+  z-index: 1;
+}
+
+.showcase-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.showcase-source {
+  font-size: 13px;
+  color: #999;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.showcase-refresh {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fafafa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #666;
+}
+
+.showcase-refresh:hover {
+  background: #f0f0f0;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #333;
+  transform: rotate(30deg);
+}
+
+.showcase-refresh:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+.showcase-refresh.refreshing {
+  animation: spin 1s linear infinite;
+  pointer-events: none;
+}
+
+.showcase-refresh svg {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.showcase-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 48px;
+  gap: 20px;
+}
+
+.decoration-line {
+  flex: 1;
+  max-width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+}
+
+.decoration-text {
+  font-size: 11px;
+  color: #bbb;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* 骨架屏加载动画 */
+.showcase-skeleton {
+  padding: 56px 64px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.skeleton-line {
+  height: 22px;
+  border-radius: 11px;
+  background: linear-gradient(90deg,
+    #f5f5f5 25%,
+    #ebebeb 50%,
+    #f5f5f5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-line-1 {
+  width: 75%;
+  margin: 0 auto 16px;
+}
+
+.skeleton-line-2 {
+  width: 55%;
+  margin: 0 auto;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* =====================================================
+   Hero 区域
+   ===================================================== */
+
+.hero {
+  padding: 100px 0 80px;
+  text-align: center;
+  background: #ffffff;
 }
 
 .hero-title {
-  font-size: 56px;
+  font-size: 52px;
   font-weight: 700;
-  letter-spacing: -2px;
+  letter-spacing: -1.5px;
   margin-bottom: 20px;
-  line-height: 1.1;
+  line-height: 1.15;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-subtitle {
-  font-size: 24px;
-  color: var(--secondary);
-  margin-bottom: 40px;
+  font-size: 20px;
+  color: #888;
+  margin-bottom: 44px;
+  font-weight: 400;
 }
 
 .hero-actions {
@@ -28,33 +249,185 @@
 }
 
 .btn-large {
-  padding: 16px 32px;
-  font-size: 17px;
+  padding: 16px 36px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
+/* =====================================================
+   Features 区域
+   ===================================================== */
+
 .features {
-  padding: 80px 0;
-  background: var(--bg-primary);
+  padding: 100px 0;
+  background: #fafafa;
 }
 
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
+  gap: 28px;
 }
 
 .feature-card {
   text-align: center;
-  padding: 40px 24px;
+  padding: 52px 36px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #f8f8f8 0%, #f0f0f0 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.feature-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke: #555;
 }
 
 .feature-card h3 {
-  font-size: 24px;
-  margin-bottom: 12px;
+  font-size: 20px;
+  margin-bottom: 14px;
   font-weight: 600;
+  color: #1a1a1a;
 }
 
 .feature-card p {
-  color: var(--secondary);
-  font-size: 17px;
+  color: #888;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* =====================================================
+   响应式布局
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .showcase-section {
+    padding: 60px 0 40px;
+  }
+
+  .showcase-card {
+    padding: 40px 28px;
+    border-radius: 16px;
+  }
+
+  .showcase-quote-mark {
+    font-size: 72px;
+    top: 16px;
+    left: 20px;
+  }
+
+  .showcase-content {
+    font-size: 18px;
+    line-height: 1.8;
+  }
+
+  .showcase-footer {
+    margin-top: 28px;
+    padding-top: 24px;
+  }
+
+  .showcase-source {
+    font-size: 12px;
+  }
+
+  .hero {
+    padding: 70px 0 60px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+    letter-spacing: -1px;
+  }
+
+  .hero-subtitle {
+    font-size: 17px;
+    margin-bottom: 36px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn-large {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .features {
+    padding: 70px 0;
+  }
+
+  .feature-grid {
+    gap: 20px;
+  }
+
+  .feature-card {
+    padding: 40px 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .showcase-container {
+    padding: 0 16px;
+  }
+
+  .showcase-card {
+    padding: 32px 24px;
+  }
+
+  .showcase-content {
+    font-size: 16px;
+  }
+
+  .showcase-quote-mark {
+    font-size: 56px;
+    left: 16px;
+  }
+
+  .decoration-text {
+    font-size: 10px;
+    letter-spacing: 3px;
+  }
+
+  .decoration-line {
+    max-width: 60px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+  }
+
+  .feature-card h3 {
+    font-size: 18px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+  }
 }

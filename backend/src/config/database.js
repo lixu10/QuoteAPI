@@ -86,7 +86,44 @@ class DatabaseManager {
       CREATE INDEX IF NOT EXISTS idx_logs_time ON access_logs(accessed_at);
       CREATE INDEX IF NOT EXISTS idx_endpoints_user ON endpoints(user_id);
       CREATE INDEX IF NOT EXISTS idx_endpoints_name ON endpoints(name);
+
+      CREATE TABLE IF NOT EXISTS home_showcase (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source_type TEXT NOT NULL CHECK(source_type IN ('repository', 'endpoint')),
+        source_id INTEGER,
+        source_name TEXT NOT NULL,
+        is_active INTEGER DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS api_keys (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        key_value TEXT UNIQUE NOT NULL,
+        name TEXT,
+        is_active INTEGER DEFAULT 1,
+        last_used_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
+      CREATE INDEX IF NOT EXISTS idx_api_keys_value ON api_keys(key_value);
     `);
+
+    // 添加 visibility 字段到现有表（如果不存在）
+    this.addColumnIfNotExists('repositories', 'visibility', "TEXT DEFAULT 'public'");
+    this.addColumnIfNotExists('endpoints', 'visibility', "TEXT DEFAULT 'public'");
+  }
+
+  addColumnIfNotExists(tableName, columnName, columnDef) {
+    const tableInfo = this.db.prepare(`PRAGMA table_info(${tableName})`).all();
+    const columnExists = tableInfo.some(col => col.name === columnName);
+    if (!columnExists) {
+      this.db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDef}`);
+      console.log(`Added column ${columnName} to ${tableName}`);
+    }
   }
 
   async initDefaultAdmin() {

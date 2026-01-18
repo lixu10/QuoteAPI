@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { repositoryApi } from '../api';
+import { endpointApi } from '../api';
 import { formatBeijingDateTime } from '../utils/timeUtils';
-import './Repositories.css';
+import './EndpointList.css';
 
-const Repositories = () => {
-  const [repositories, setRepositories] = useState([]);
+function EndpointList() {
+  const [endpoints, setEndpoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -16,30 +16,30 @@ const Repositories = () => {
     totalPages: 0
   });
 
-  const loadRepositories = useCallback(async () => {
+  const fetchEndpoints = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await repositoryApi.getAll({
+      const response = await endpointApi.getAll({
         search,
         page: pagination.page,
         limit: pagination.limit
       });
-      setRepositories(response.data.data || []);
+      setEndpoints(response.data.data || []);
       setPagination(prev => ({
         ...prev,
         ...response.data.pagination
       }));
-    } catch (err) {
-      console.error('加载仓库失败:', err);
-      setRepositories([]);
+    } catch (error) {
+      console.error('Failed to fetch endpoints:', error);
+      setEndpoints([]);
     } finally {
       setLoading(false);
     }
   }, [search, pagination.page, pagination.limit]);
 
   useEffect(() => {
-    loadRepositories();
-  }, [loadRepositories]);
+    fetchEndpoints();
+  }, [fetchEndpoints]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -64,13 +64,13 @@ const Repositories = () => {
   };
 
   return (
-    <div className="repositories-page">
+    <div className="endpoint-list-page">
       <div className="container">
         <div className="page-header">
           <div className="header-content">
-            <h1>仓库列表</h1>
+            <h1>端口列表</h1>
             <p className="page-description">
-              浏览所有公开的语句仓库，通过 API 调用获取随机语句
+              浏览所有公开的端口，可以直接调用获取动态内容
             </p>
           </div>
         </div>
@@ -85,7 +85,7 @@ const Repositories = () => {
               </svg>
               <input
                 type="text"
-                placeholder="搜索仓库名称、描述或创建者..."
+                placeholder="搜索端口名称、描述或创建者..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="search-input"
@@ -115,62 +115,63 @@ const Repositories = () => {
           )}
         </div>
 
-        {/* 仓库列表 */}
+        {/* 端口列表 */}
         {loading ? (
           <div className="loading-state">
             <div className="loading-spinner"></div>
             <p>加载中...</p>
           </div>
-        ) : repositories.length === 0 ? (
+        ) : endpoints.length === 0 ? (
           <div className="empty-state">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+              <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
-            <h3>暂无仓库</h3>
-            <p>{search ? '没有找到匹配的仓库，请尝试其他关键词' : '还没有公开的仓库'}</p>
+            <h3>暂无端口</h3>
+            <p>{search ? '没有找到匹配的端口，请尝试其他关键词' : '还没有公开的端口'}</p>
           </div>
         ) : (
           <>
-            <div className="repo-grid">
-              {repositories.map((repo) => (
-                <div key={repo.id} className="repo-card">
+            <div className="endpoint-grid">
+              {endpoints.map((endpoint) => (
+                <div key={endpoint.id} className="endpoint-card">
                   <div className="card-header">
-                    <h3 className="repo-name">{repo.name}</h3>
-                    <span className={`visibility-badge visibility-${repo.visibility || 'public'}`}>
-                      {getVisibilityLabel(repo.visibility)}
+                    <h3 className="endpoint-name">{endpoint.name}</h3>
+                    <span className={`visibility-badge visibility-${endpoint.visibility || 'public'}`}>
+                      {getVisibilityLabel(endpoint.visibility)}
                     </span>
                   </div>
-                  <p className="repo-desc">
-                    {repo.description || '暂无描述'}
+                  <p className="endpoint-desc">
+                    {endpoint.description || '暂无描述'}
                   </p>
-                  <div className="repo-meta">
+                  <div className="endpoint-meta">
                     <span className="meta-item">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
                       </svg>
-                      {repo.username}
-                    </span>
-                    <span className="meta-item">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                      </svg>
-                      {repo.quote_count || 0} 条语句
+                      {endpoint.username}
                     </span>
                     <span className="meta-item">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                       </svg>
-                      {repo.api_calls || 0} 次调用
+                      {endpoint.call_count || 0} 次调用
                     </span>
                   </div>
-                  <div className="repo-footer">
+                  <div className="endpoint-footer">
                     <span className="created-date">
-                      {formatBeijingDateTime(repo.created_at)}
+                      {formatBeijingDateTime(endpoint.created_at)}
                     </span>
-                    <Link to={`/repository/${repo.id}`} className="btn btn-sm btn-secondary">
-                      查看详情
-                    </Link>
+                    <div className="card-actions">
+                      <a
+                        href={`/endpoints/run/${endpoint.name}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-sm btn-secondary"
+                      >
+                        调用
+                      </a>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -246,13 +247,13 @@ const Repositories = () => {
             )}
 
             <div className="pagination-info">
-              第 {pagination.page} 页，共 {pagination.totalPages} 页（{pagination.total} 个仓库）
+              第 {pagination.page} 页，共 {pagination.totalPages} 页（{pagination.total} 个端口）
             </div>
           </>
         )}
       </div>
     </div>
   );
-};
+}
 
-export default Repositories;
+export default EndpointList;

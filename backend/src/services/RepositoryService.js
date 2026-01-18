@@ -7,12 +7,12 @@ export class RepositoryService {
     this.quoteModel = new Quote();
   }
 
-  createRepository(name, userId, description) {
+  createRepository(name, userId, description, visibility = 'public') {
     const existing = this.repoModel.findByName(name);
     if (existing) {
       throw new Error('仓库名已存在');
     }
-    return this.repoModel.createRepository(name, userId, description);
+    return this.repoModel.createRepository(name, userId, description, visibility);
   }
 
   getUserRepositories(userId) {

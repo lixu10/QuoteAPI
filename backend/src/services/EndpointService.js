@@ -21,13 +21,13 @@ export class EndpointService {
     return this.endpointModel.findById(id);
   }
 
-  createEndpoint(name, userId, description, code) {
+  createEndpoint(name, userId, description, code, visibility = 'public') {
     const existing = this.endpointModel.findByName(name);
     if (existing) {
       throw new Error('端口名称已存在');
     }
 
-    return this.endpointModel.createEndpoint(name, userId, description, code);
+    return this.endpointModel.createEndpoint(name, userId, description, code, visibility);
   }
 
   updateEndpoint(id, userId, data) {

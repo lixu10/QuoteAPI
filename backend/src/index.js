@@ -8,7 +8,11 @@ import quoteRoutes from './routes/quotes.js';
 import apiRoutes from './routes/api.js';
 import statsRoutes from './routes/stats.js';
 import endpointRoutes from './routes/endpoints.js';
+import homeRoutes from './routes/home.js';
+import apikeyRoutes from './routes/apikeys.js';
+import adminRoutes from './routes/admin.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
+import { apiKeyMiddleware } from './middleware/auth.js';
 
 async function startServer() {
   try {
@@ -22,12 +26,18 @@ async function startServer() {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
+    // API KEY 中间件 - 在所有路由之前解析 API KEY
+    app.use(apiKeyMiddleware);
+
     app.use('/auth', authRoutes);
     app.use('/repositories', repositoryRoutes);
     app.use('/quotes', quoteRoutes);
     app.use('/api', apiRoutes);
     app.use('/stats', statsRoutes);
     app.use('/endpoints', endpointRoutes);
+    app.use('/api/home', homeRoutes);
+    app.use('/apikeys', apikeyRoutes);
+    app.use('/admin', adminRoutes);
 
     app.get('/health', (req, res) => {
       res.json({ status: 'ok' });

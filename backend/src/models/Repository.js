@@ -15,8 +15,8 @@ export class Repository extends BaseModel {
     return stmt.all(userId);
   }
 
-  createRepository(name, userId, description = '') {
-    return this.create({ name, user_id: userId, description });
+  createRepository(name, userId, description = '', visibility = 'public') {
+    return this.create({ name, user_id: userId, description, visibility });
   }
 
   incrementApiCalls(id) {

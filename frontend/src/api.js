@@ -36,7 +36,7 @@ export const authApi = {
 };
 
 export const repositoryApi = {
-  getAll: () => api.get('/repositories/all'),
+  getAll: (params) => api.get('/repositories/all', { params }),
   getUserRepos: () => api.get('/repositories'),
   getById: (id) => api.get(`/repositories/${id}`),
   create: (data) => api.post('/repositories', data),
@@ -63,13 +63,40 @@ export const statsApi = {
 };
 
 export const endpointApi = {
-  getAll: () => api.get('/endpoints'),
+  getAll: (params) => api.get('/endpoints/all', { params }),
+  getUserEndpoints: () => api.get('/endpoints'),
   getById: (id) => api.get(`/endpoints/${id}`),
   create: (data) => api.post('/endpoints', data),
   update: (id, data) => api.put(`/endpoints/${id}`, data),
   delete: (id) => api.delete(`/endpoints/${id}`),
   toggle: (id) => api.post(`/endpoints/${id}/toggle`),
   run: (name) => api.get(`/endpoints/run/${name}`)
+};
+
+export const homeShowcaseApi = {
+  getData: () => api.get('/api/home/data'),
+  getConfig: () => api.get('/api/home/config'),
+  getRepositories: () => api.get('/api/home/repositories'),
+  getEndpoints: () => api.get('/api/home/endpoints'),
+  setShowcase: (sourceType, sourceName) => api.post('/api/home/set', { sourceType, sourceName }),
+  clearShowcase: () => api.post('/api/home/clear')
+};
+
+export const apiKeyApi = {
+  getAll: () => api.get('/apikeys'),
+  create: (name) => api.post('/apikeys', { name }),
+  rename: (id, name) => api.put(`/apikeys/${id}`, { name }),
+  toggle: (id) => api.post(`/apikeys/${id}/toggle`),
+  delete: (id) => api.delete(`/apikeys/${id}`)
+};
+
+export const adminApi = {
+  getRepositories: () => api.get('/admin/repositories'),
+  getEndpoints: () => api.get('/admin/endpoints'),
+  updateRepoVisibility: (id, visibility) => api.put(`/admin/repositories/${id}/visibility`, { visibility }),
+  updateEndpointVisibility: (id, visibility) => api.put(`/admin/endpoints/${id}/visibility`, { visibility }),
+  deleteRepository: (id) => api.delete(`/admin/repositories/${id}`),
+  deleteEndpoint: (id) => api.delete(`/admin/endpoints/${id}`)
 };
 
 export default api;

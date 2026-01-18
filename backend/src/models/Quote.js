@@ -34,4 +34,14 @@ export class Quote extends BaseModel {
     );
     return stmt.get(repositoryId);
   }
+
+  getRandomByRepoName(repoName) {
+    const stmt = this.db.prepare(`
+      SELECT q.* FROM quotes q
+      INNER JOIN repositories r ON q.repository_id = r.id
+      WHERE r.name = ?
+      ORDER BY RANDOM() LIMIT 1
+    `);
+    return stmt.get(repoName);
+  }
 }

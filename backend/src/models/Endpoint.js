@@ -15,12 +15,13 @@ export class Endpoint extends BaseModel {
     return stmt.all(userId);
   }
 
-  createEndpoint(name, userId, description, code) {
+  createEndpoint(name, userId, description, code, visibility = 'public') {
     return this.create({
       name,
       user_id: userId,
       description,
       code,
+      visibility,
       is_active: 1,
       call_count: 0
     });
