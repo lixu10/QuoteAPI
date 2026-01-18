@@ -123,6 +123,8 @@ class DatabaseManager {
     // 添加 visibility 字段到现有表（如果不存在）
     this.addColumnIfNotExists('repositories', 'visibility', "TEXT DEFAULT 'public'");
     this.addColumnIfNotExists('endpoints', 'visibility', "TEXT DEFAULT 'public'");
+    // 添加 metadata 字段用于存储端口 API 文档配置
+    this.addColumnIfNotExists('endpoints', 'metadata', "TEXT DEFAULT '{}'");
   }
 
   addColumnIfNotExists(tableName, columnName, columnDef) {

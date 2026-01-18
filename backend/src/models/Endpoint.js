@@ -15,13 +15,14 @@ export class Endpoint extends BaseModel {
     return stmt.all(userId);
   }
 
-  createEndpoint(name, userId, description, code, visibility = 'public') {
+  createEndpoint(name, userId, description, code, visibility = 'public', metadata = '{}') {
     return this.create({
       name,
       user_id: userId,
       description,
       code,
       visibility,
+      metadata: typeof metadata === 'string' ? metadata : JSON.stringify(metadata),
       is_active: 1,
       call_count: 0
     });

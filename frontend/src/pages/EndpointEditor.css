@@ -280,3 +280,101 @@
     max-height: 500px;
   }
 }
+
+/* 元数据配置样式 */
+.metadata-section {
+  padding: 24px;
+}
+
+.metadata-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.metadata-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.metadata-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.params-section {
+  background-color: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.params-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.params-header label {
+  font-weight: 500;
+  margin: 0;
+}
+
+.params-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.params-table th,
+.params-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.params-table th {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.params-table .input-sm,
+.params-table .select-sm {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.params-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.code-input {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 12px;
+}

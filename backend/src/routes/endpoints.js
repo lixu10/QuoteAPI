@@ -96,7 +96,7 @@ router.get('/all', (req, res, next) => {
 
     // 获取分页数据
     const dataStmt = db.prepare(`
-      SELECT e.id, e.name, e.description, e.visibility, e.call_count, e.is_active, e.created_at, u.username
+      SELECT e.id, e.name, e.description, e.visibility, e.call_count, e.is_active, e.created_at, e.metadata, e.code, u.username
       FROM endpoints e
       LEFT JOIN users u ON e.user_id = u.id
       ${whereClause}
@@ -120,6 +120,7 @@ router.get('/all', (req, res, next) => {
 });
 
 // 执行端口（公开API，通过端口名称访问）- 必须在 /:id 之前定义
+// 支持 GET 和 POST 请求
 router.get('/run/:name', async (req, res, next) => {
   try {
     const endpoint = endpointModel.findByName(req.params.name);
@@ -133,7 +134,36 @@ router.get('/run/:name', async (req, res, next) => {
     const requestData = {
       ip: getClientIp(req),
       userAgent: req.headers['user-agent'],
-      referer: req.headers.referer || req.headers.referrer
+      referer: req.headers.referer || req.headers.referrer,
+      params: req.query || {} // GET 请求的 query 参数
+    };
+
+    const result = await endpointService.executeEndpoint(req.params.name, requestData);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST 请求支持 JSON body 参数
+router.post('/run/:name', async (req, res, next) => {
+  try {
+    const endpoint = endpointModel.findByName(req.params.name);
+
+    // 检查访问权限
+    const accessCheck = checkEndpointAccess(req, endpoint);
+    if (!accessCheck.allowed) {
+      return res.status(accessCheck.status).json({ error: accessCheck.error });
+    }
+
+    // 合并 query 参数和 body 参数，body 优先
+    const params = { ...req.query, ...(req.body || {}) };
+
+    const requestData = {
+      ip: getClientIp(req),
+      userAgent: req.headers['user-agent'],
+      referer: req.headers.referer || req.headers.referrer,
+      params: params
     };
 
     const result = await endpointService.executeEndpoint(req.params.name, requestData);
@@ -175,13 +205,13 @@ router.get('/:id', authMiddleware, (req, res, next) => {
 // 创建新端口
 router.post('/', authMiddleware, (req, res, next) => {
   try {
-    const { name, description, code, visibility } = req.body;
+    const { name, description, code, visibility, metadata } = req.body;
 
     if (!name || !code) {
       return res.status(400).json({ error: '端口名称和代码不能为空' });
     }
 
-    const id = endpointService.createEndpoint(name, req.user.id, description, code, visibility);
+    const id = endpointService.createEndpoint(name, req.user.id, description, code, visibility, metadata);
     res.status(201).json({ id, name });
   } catch (error) {
     next(error);
@@ -191,13 +221,16 @@ router.post('/', authMiddleware, (req, res, next) => {
 // 更新端口
 router.put('/:id', authMiddleware, (req, res, next) => {
   try {
-    const { name, description, code, visibility } = req.body;
+    const { name, description, code, visibility, metadata } = req.body;
     const data = {};
 
     if (name !== undefined) data.name = name;
     if (description !== undefined) data.description = description;
     if (code !== undefined) data.code = code;
     if (visibility !== undefined) data.visibility = visibility;
+    if (metadata !== undefined) {
+      data.metadata = typeof metadata === 'string' ? metadata : JSON.stringify(metadata);
+    }
 
     endpointService.updateEndpoint(parseInt(req.params.id), req.user.id, data);
     res.json({ message: '更新成功' });
