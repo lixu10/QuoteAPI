@@ -104,7 +104,7 @@ class ApiKey {
     if (keyInfo) {
       this.updateLastUsed(keyInfo.id);
       return {
-        userId: keyInfo.user_id,
+        id: keyInfo.user_id,
         username: keyInfo.username,
         isAdmin: keyInfo.is_admin === 1,
         keyId: keyInfo.id

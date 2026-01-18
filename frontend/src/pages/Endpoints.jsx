@@ -15,9 +15,10 @@ const Endpoints = () => {
 
   const loadEndpoints = async () => {
     try {
-      const response = await endpointApi.getAll();
-      setEndpoints(response.data);
+      const response = await endpointApi.getUserEndpoints();
+      setEndpoints(response.data || []);
     } catch (err) {
+      console.error('加载端口失败:', err);
       alert('加载失败');
     } finally {
       setLoading(false);

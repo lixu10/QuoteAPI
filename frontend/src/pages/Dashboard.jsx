@@ -17,8 +17,9 @@ const Dashboard = () => {
   const loadRepositories = async () => {
     try {
       const response = await repositoryApi.getUserRepos();
-      setRepositories(response.data);
+      setRepositories(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
+      console.error('加载仓库失败:', err);
       setError('加载失败');
     } finally {
       setLoading(false);

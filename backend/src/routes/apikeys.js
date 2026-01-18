@@ -10,7 +10,7 @@ router.use(authenticateToken);
 // 获取当前用户的所有 API KEY
 router.get('/', (req, res) => {
   try {
-    const keys = ApiKey.getByUserId(req.user.userId);
+    const keys = ApiKey.getByUserId(req.user.id);
     // 隐藏完整的 key，只显示前缀
     const safeKeys = keys.map(key => ({
       ...key,
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   try {
     const { name } = req.body;
-    const newKey = ApiKey.create(req.user.userId, name);
+    const newKey = ApiKey.create(req.user.id, name);
     res.status(201).json({
       message: 'API KEY 创建成功，请保存好您的密钥，它只会显示一次',
       key: newKey
@@ -43,7 +43,7 @@ router.put('/:id', (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
-    const updated = ApiKey.rename(parseInt(id), req.user.userId, name);
+    const updated = ApiKey.rename(parseInt(id), req.user.id, name);
     if (!updated) {
       return res.status(404).json({ message: 'API KEY 不存在或无权限' });
     }
@@ -58,7 +58,7 @@ router.put('/:id', (req, res) => {
 router.post('/:id/toggle', (req, res) => {
   try {
     const { id } = req.params;
-    const updated = ApiKey.toggleActive(parseInt(id), req.user.userId);
+    const updated = ApiKey.toggleActive(parseInt(id), req.user.id);
     if (!updated) {
       return res.status(404).json({ message: 'API KEY 不存在或无权限' });
     }
@@ -76,7 +76,7 @@ router.post('/:id/toggle', (req, res) => {
 router.delete('/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = ApiKey.delete(parseInt(id), req.user.userId);
+    const deleted = ApiKey.delete(parseInt(id), req.user.id);
     if (!deleted) {
       return res.status(404).json({ message: 'API KEY 不存在或无权限' });
     }

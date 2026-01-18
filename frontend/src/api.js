@@ -83,20 +83,20 @@ export const homeShowcaseApi = {
 };
 
 export const apiKeyApi = {
-  getAll: () => api.get('/apikeys'),
-  create: (name) => api.post('/apikeys', { name }),
-  rename: (id, name) => api.put(`/apikeys/${id}`, { name }),
-  toggle: (id) => api.post(`/apikeys/${id}/toggle`),
-  delete: (id) => api.delete(`/apikeys/${id}`)
+  getAll: () => api.get('/api/apikeys'),
+  create: (name) => api.post('/api/apikeys', { name }),
+  rename: (id, name) => api.put(`/api/apikeys/${id}`, { name }),
+  toggle: (id) => api.post(`/api/apikeys/${id}/toggle`),
+  delete: (id) => api.delete(`/api/apikeys/${id}`)
 };
 
 export const adminApi = {
-  getRepositories: () => api.get('/admin/repositories'),
-  getEndpoints: () => api.get('/admin/endpoints'),
-  updateRepoVisibility: (id, visibility) => api.put(`/admin/repositories/${id}/visibility`, { visibility }),
-  updateEndpointVisibility: (id, visibility) => api.put(`/admin/endpoints/${id}/visibility`, { visibility }),
-  deleteRepository: (id) => api.delete(`/admin/repositories/${id}`),
-  deleteEndpoint: (id) => api.delete(`/admin/endpoints/${id}`)
+  getRepositories: () => api.get('/api/admin/repositories'),
+  getEndpoints: () => api.get('/api/admin/endpoints'),
+  updateRepoVisibility: (id, visibility) => api.put(`/api/admin/repositories/${id}/visibility`, { visibility }),
+  updateEndpointVisibility: (id, visibility) => api.put(`/api/admin/endpoints/${id}/visibility`, { visibility }),
+  deleteRepository: (id) => api.delete(`/api/admin/repositories/${id}`),
+  deleteEndpoint: (id) => api.delete(`/api/admin/endpoints/${id}`)
 };
 
 export default api;

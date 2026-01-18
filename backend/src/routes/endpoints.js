@@ -23,7 +23,7 @@ function checkEndpointAccess(req, endpoint) {
   }
 
   // 获取用户信息（可能来自 JWT 或 API KEY）
-  const userId = req.user?.userId || req.apiKeyUser?.userId;
+  const userId = req.user?.id || req.apiKeyUser?.id;
   const isAdmin = req.user?.isAdmin || req.apiKeyUser?.isAdmin;
 
   // restricted: 需要登录或有效的 API KEY
@@ -61,7 +61,7 @@ router.get('/all', (req, res, next) => {
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     // 获取当前用户信息
-    const userId = req.user?.userId || req.apiKeyUser?.userId;
+    const userId = req.user?.id || req.apiKeyUser?.id;
     const isAdmin = req.user?.isAdmin || req.apiKeyUser?.isAdmin;
 
     let whereClause = 'WHERE e.is_active = 1';
@@ -119,90 +119,7 @@ router.get('/all', (req, res, next) => {
   }
 });
 
-// 获取用户的所有端口
-router.get('/', authMiddleware, (req, res, next) => {
-  try {
-    const endpoints = endpointService.getUserEndpoints(req.user.userId);
-    res.json(endpoints);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 获取单个端口详情
-router.get('/:id', authMiddleware, (req, res, next) => {
-  try {
-    const endpoint = endpointService.getEndpoint(parseInt(req.params.id));
-    if (!endpoint) {
-      return res.status(404).json({ error: '端口不存在' });
-    }
-
-    // 检查权限
-    if (endpoint.user_id !== req.user.userId && !req.user.isAdmin) {
-      return res.status(403).json({ error: '无权访问此端口' });
-    }
-
-    res.json(endpoint);
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 创建新端口
-router.post('/', authMiddleware, (req, res, next) => {
-  try {
-    const { name, description, code, visibility } = req.body;
-
-    if (!name || !code) {
-      return res.status(400).json({ error: '端口名称和代码不能为空' });
-    }
-
-    const id = endpointService.createEndpoint(name, req.user.userId, description, code, visibility);
-    res.status(201).json({ id, name });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 更新端口
-router.put('/:id', authMiddleware, (req, res, next) => {
-  try {
-    const { name, description, code, visibility } = req.body;
-    const data = {};
-
-    if (name !== undefined) data.name = name;
-    if (description !== undefined) data.description = description;
-    if (code !== undefined) data.code = code;
-    if (visibility !== undefined) data.visibility = visibility;
-
-    endpointService.updateEndpoint(parseInt(req.params.id), req.user.userId, data);
-    res.json({ message: '更新成功' });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 删除端口
-router.delete('/:id', authMiddleware, (req, res, next) => {
-  try {
-    endpointService.deleteEndpoint(parseInt(req.params.id), req.user.userId);
-    res.json({ message: '删除成功' });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 切换端口启用状态
-router.post('/:id/toggle', authMiddleware, (req, res, next) => {
-  try {
-    endpointService.toggleEndpoint(parseInt(req.params.id), req.user.userId);
-    res.json({ message: '状态切换成功' });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// 执行端口（公开API，通过端口名称访问）
+// 执行端口（公开API，通过端口名称访问）- 必须在 /:id 之前定义
 router.get('/run/:name', async (req, res, next) => {
   try {
     const endpoint = endpointModel.findByName(req.params.name);
@@ -221,6 +138,89 @@ router.get('/run/:name', async (req, res, next) => {
 
     const result = await endpointService.executeEndpoint(req.params.name, requestData);
     res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 获取用户的所有端口
+router.get('/', authMiddleware, (req, res, next) => {
+  try {
+    const endpoints = endpointService.getUserEndpoints(req.user.id);
+    res.json(endpoints);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 获取单个端口详情
+router.get('/:id', authMiddleware, (req, res, next) => {
+  try {
+    const endpoint = endpointService.getEndpoint(parseInt(req.params.id));
+    if (!endpoint) {
+      return res.status(404).json({ error: '端口不存在' });
+    }
+
+    // 检查权限
+    if (endpoint.user_id !== req.user.id && !req.user.isAdmin) {
+      return res.status(403).json({ error: '无权访问此端口' });
+    }
+
+    res.json(endpoint);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 创建新端口
+router.post('/', authMiddleware, (req, res, next) => {
+  try {
+    const { name, description, code, visibility } = req.body;
+
+    if (!name || !code) {
+      return res.status(400).json({ error: '端口名称和代码不能为空' });
+    }
+
+    const id = endpointService.createEndpoint(name, req.user.id, description, code, visibility);
+    res.status(201).json({ id, name });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 更新端口
+router.put('/:id', authMiddleware, (req, res, next) => {
+  try {
+    const { name, description, code, visibility } = req.body;
+    const data = {};
+
+    if (name !== undefined) data.name = name;
+    if (description !== undefined) data.description = description;
+    if (code !== undefined) data.code = code;
+    if (visibility !== undefined) data.visibility = visibility;
+
+    endpointService.updateEndpoint(parseInt(req.params.id), req.user.id, data);
+    res.json({ message: '更新成功' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 删除端口
+router.delete('/:id', authMiddleware, (req, res, next) => {
+  try {
+    endpointService.deleteEndpoint(parseInt(req.params.id), req.user.id);
+    res.json({ message: '删除成功' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 切换端口启用状态
+router.post('/:id/toggle', authMiddleware, (req, res, next) => {
+  try {
+    endpointService.toggleEndpoint(parseInt(req.params.id), req.user.id);
+    res.json({ message: '状态切换成功' });
   } catch (error) {
     next(error);
   }

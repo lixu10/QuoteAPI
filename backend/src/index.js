@@ -36,8 +36,8 @@ async function startServer() {
     app.use('/stats', statsRoutes);
     app.use('/endpoints', endpointRoutes);
     app.use('/api/home', homeRoutes);
-    app.use('/apikeys', apikeyRoutes);
-    app.use('/admin', adminRoutes);
+    app.use('/api/apikeys', apikeyRoutes);
+    app.use('/api/admin', adminRoutes);
 
     app.get('/health', (req, res) => {
       res.json({ status: 'ok' });

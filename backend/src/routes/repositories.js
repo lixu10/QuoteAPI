@@ -12,7 +12,7 @@ router.post('/', authMiddleware, (req, res, next) => {
     if (!name) {
       return res.status(400).json({ error: '仓库名不能为空' });
     }
-    const id = repoService.createRepository(name, req.user.userId, description, visibility);
+    const id = repoService.createRepository(name, req.user.id, description, visibility);
     res.status(201).json({ id, name, description, visibility: visibility || 'public' });
   } catch (error) {
     next(error);
@@ -21,7 +21,7 @@ router.post('/', authMiddleware, (req, res, next) => {
 
 router.get('/', authMiddleware, (req, res, next) => {
   try {
-    const repos = repoService.getUserRepositories(req.user.userId);
+    const repos = repoService.getUserRepositories(req.user.id);
     res.json(repos);
   } catch (error) {
     next(error);
@@ -36,7 +36,7 @@ router.get('/all', (req, res, next) => {
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     // 获取当前用户信息
-    const userId = req.user?.userId || req.apiKeyUser?.userId;
+    const userId = req.user?.id || req.apiKeyUser?.id;
     const isAdmin = req.user?.isAdmin || req.apiKeyUser?.isAdmin;
 
     let whereClause = 'WHERE 1=1';
@@ -112,7 +112,7 @@ router.get('/:id', (req, res, next) => {
 router.put('/:id', authMiddleware, (req, res, next) => {
   try {
     const { name, description, visibility } = req.body;
-    repoService.updateRepository(parseInt(req.params.id), req.user.userId, { name, description, visibility });
+    repoService.updateRepository(parseInt(req.params.id), req.user.id, { name, description, visibility });
     res.json({ message: '仓库更新成功' });
   } catch (error) {
     next(error);
@@ -121,7 +121,7 @@ router.put('/:id', authMiddleware, (req, res, next) => {
 
 router.delete('/:id', authMiddleware, (req, res, next) => {
   try {
-    repoService.deleteRepository(parseInt(req.params.id), req.user.userId);
+    repoService.deleteRepository(parseInt(req.params.id), req.user.id);
     res.json({ message: '仓库删除成功' });
   } catch (error) {
     next(error);

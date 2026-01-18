@@ -21,7 +21,7 @@ function checkRepoAccess(req, repo) {
   }
 
   // 获取用户信息（可能来自 JWT 或 API KEY）
-  const userId = req.user?.userId || req.apiKeyUser?.userId;
+  const userId = req.user?.id || req.apiKeyUser?.id;
   const isAdmin = req.user?.isAdmin || req.apiKeyUser?.isAdmin;
 
   // restricted: 需要登录或有效的 API KEY
