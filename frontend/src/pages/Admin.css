@@ -431,3 +431,136 @@
     min-width: 500px;
   }
 }
+
+/* AI 配置设置 */
+.ai-config-settings {
+  margin-bottom: 32px;
+}
+
+.ai-config-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-config-header h2 {
+  margin-bottom: 8px;
+}
+
+.ai-config-desc {
+  color: var(--secondary);
+  font-size: 15px;
+}
+
+.ai-config-desc code {
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Monaco', monospace;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.ai-config-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.ai-config-form .form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.ai-config-form .form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-primary);
+}
+
+.ai-config-form .form-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--secondary);
+}
+
+.test-result {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+
+.test-result.success {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.test-result.success strong {
+  color: #166534;
+}
+
+.test-result.success p {
+  color: #15803d;
+  margin-top: 8px;
+}
+
+.test-result.error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+}
+
+.test-result.error strong {
+  color: #991b1b;
+}
+
+.test-result.error p {
+  color: #b91c1c;
+  margin-top: 8px;
+}
+
+.test-response {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.ai-usage-guide {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.ai-usage-guide h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+.ai-usage-guide p {
+  color: var(--secondary);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.ai-usage-guide pre {
+  background: #1a1a1a;
+  color: #f0f0f0;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-family: 'Fira Code', 'Monaco', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

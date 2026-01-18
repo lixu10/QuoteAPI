@@ -110,7 +110,11 @@ export const adminApi = {
   updateRepoVisibility: (id, visibility) => api.put(`/api/admin/repositories/${id}/visibility`, { visibility }),
   updateEndpointVisibility: (id, visibility) => api.put(`/api/admin/endpoints/${id}/visibility`, { visibility }),
   deleteRepository: (id) => api.delete(`/api/admin/repositories/${id}`),
-  deleteEndpoint: (id) => api.delete(`/api/admin/endpoints/${id}`)
+  deleteEndpoint: (id) => api.delete(`/api/admin/endpoints/${id}`),
+  // AI 配置
+  getAiConfig: () => api.get('/api/admin/ai-config'),
+  saveAiConfig: (config) => api.post('/api/admin/ai-config', config),
+  testAiConfig: () => api.post('/api/admin/ai-config/test')
 };
 
 export default api;

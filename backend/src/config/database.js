@@ -110,6 +110,14 @@ class DatabaseManager {
 
       CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
       CREATE INDEX IF NOT EXISTS idx_api_keys_value ON api_keys(key_value);
+
+      CREATE TABLE IF NOT EXISTS system_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        config_key TEXT UNIQUE NOT NULL,
+        config_value TEXT,
+        description TEXT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     // 添加 visibility 字段到现有表（如果不存在）

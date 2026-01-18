@@ -1,6 +1,7 @@
 import { Endpoint } from '../models/Endpoint.js';
 import { Repository } from '../models/Repository.js';
 import { Quote } from '../models/Quote.js';
+import systemConfig from '../models/SystemConfig.js';
 import { spawn } from 'child_process';
 import { writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
@@ -105,6 +106,9 @@ export class EndpointService {
     const now = new Date();
     const chinaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
 
+    // 获取 AI 配置
+    const aiConfig = systemConfig.getAiConfig();
+
     return {
       // 时间相关（东八区）
       current_date: chinaTime.toISOString().split('T')[0],
@@ -130,6 +134,12 @@ export class EndpointService {
 
       // 端口所有者ID，用于权限检查
       endpoint_user_id: endpointUserId,
+
+      // AI 配置
+      ai_api_url: aiConfig.apiUrl || '',
+      ai_api_key: aiConfig.apiKey || '',
+      ai_model: aiConfig.model || '',
+      ai_configured: !!(aiConfig.apiUrl && aiConfig.apiKey && aiConfig.model),
 
       // 随机数相关（通过Python的random模块）
       // 这些会在Python代码中实现
@@ -253,6 +263,72 @@ def get_random_quote(repo_name):
             }
     except Exception as e:
         return {'content': f'Error: {str(e)}', 'link': ''}
+
+def call_endpoint(endpoint_name):
+    """调用系统中的其他端口，返回端口执行结果"""
+    try:
+        url = f'http://localhost:3077/endpoints/run/{urllib.parse.quote(endpoint_name)}'
+        # 创建请求并添加端口所有者ID到头部，用于权限检查
+        req = urllib.request.Request(url)
+        req.add_header('X-Forwarded-For', ip_address)
+        req.add_header('User-Agent', user_agent)
+        req.add_header('X-Endpoint-User-Id', str(endpoint_user_id))
+        if referer:
+            req.add_header('Referer', referer)
+
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            return data
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else ''
+        try:
+            error_data = json.loads(error_body)
+            return {'error': error_data.get('error', f'HTTP {e.code}')}
+        except:
+            return {'error': f'HTTP {e.code}: {error_body[:100]}'}
+    except Exception as e:
+        return {'error': f'调用端口失败: {str(e)}'}
+
+def ask_ai(prompt, max_tokens=1000):
+    """调用AI大模型，传入prompt，返回模型响应内容"""
+    if not ai_configured:
+        return 'Error: AI 未配置，请联系管理员在后台配置 AI 参数'
+
+    if not prompt or not isinstance(prompt, str):
+        return 'Error: prompt 必须是非空字符串'
+
+    try:
+        # 构建请求数据
+        request_data = json.dumps({
+            'model': ai_model,
+            'messages': [{'role': 'user', 'content': prompt}],
+            'max_tokens': max_tokens
+        }).encode('utf-8')
+
+        # 创建请求
+        req = urllib.request.Request(ai_api_url, data=request_data)
+        req.add_header('Content-Type', 'application/json')
+        req.add_header('Authorization', f'Bearer {ai_api_key}')
+
+        with urllib.request.urlopen(req, timeout=30) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            # 提取响应内容
+            if 'choices' in data and len(data['choices']) > 0:
+                message = data['choices'][0].get('message', {})
+                return message.get('content', '')
+            return 'Error: 无法解析 AI 响应'
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8') if e.fp else ''
+        try:
+            error_data = json.loads(error_body)
+            error_msg = error_data.get('error', {})
+            if isinstance(error_msg, dict):
+                return f"Error: {error_msg.get('message', f'HTTP {e.code}')}"
+            return f"Error: {error_msg}"
+        except:
+            return f'Error: HTTP {e.code}'
+    except Exception as e:
+        return f'Error: AI 调用失败 - {str(e)}'
 
 def random_int(min_val=0, max_val=100):
     """生成随机整数"""

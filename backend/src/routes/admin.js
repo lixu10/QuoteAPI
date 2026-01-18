@@ -2,6 +2,7 @@ import express from 'express';
 import { authMiddleware, adminMiddleware } from '../middleware/auth.js';
 import { Repository } from '../models/Repository.js';
 import { Endpoint } from '../models/Endpoint.js';
+import systemConfig from '../models/SystemConfig.js';
 import dbManager from '../config/database.js';
 
 const router = express.Router();
@@ -126,6 +127,98 @@ router.delete('/endpoints/:id', (req, res) => {
   } catch (error) {
     console.error('Error deleting endpoint:', error);
     res.status(500).json({ error: '删除失败' });
+  }
+});
+
+// ========== AI 配置管理 ==========
+
+// 获取 AI 配置
+router.get('/ai-config', (req, res) => {
+  try {
+    const config = systemConfig.getAiConfig();
+    // 隐藏 API Key 的中间部分
+    if (config.apiKey) {
+      const key = config.apiKey;
+      if (key.length > 8) {
+        config.apiKeyMasked = key.substring(0, 4) + '****' + key.substring(key.length - 4);
+      } else {
+        config.apiKeyMasked = '****';
+      }
+    } else {
+      config.apiKeyMasked = '';
+    }
+    res.json(config);
+  } catch (error) {
+    console.error('Error getting AI config:', error);
+    res.status(500).json({ error: '获取配置失败' });
+  }
+});
+
+// 设置 AI 配置
+router.post('/ai-config', (req, res) => {
+  try {
+    const { apiUrl, apiKey, model } = req.body;
+
+    if (!apiUrl || !model) {
+      return res.status(400).json({ error: 'API 地址和模型名称不能为空' });
+    }
+
+    // 如果 apiKey 是 masked 的（包含 ****），则使用旧的 key
+    let finalApiKey = apiKey;
+    if (apiKey && apiKey.includes('****')) {
+      finalApiKey = systemConfig.get('ai_api_key') || '';
+    }
+
+    systemConfig.setAiConfig(apiUrl, finalApiKey, model);
+    res.json({ message: '配置保存成功' });
+  } catch (error) {
+    console.error('Error saving AI config:', error);
+    res.status(500).json({ error: '保存配置失败' });
+  }
+});
+
+// 测试 AI 配置
+router.post('/ai-config/test', async (req, res) => {
+  try {
+    const config = systemConfig.getAiConfig();
+
+    if (!config.apiUrl || !config.apiKey || !config.model) {
+      return res.status(400).json({ error: 'AI 配置不完整，请先完成配置' });
+    }
+
+    // 发送测试请求
+    const response = await fetch(config.apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [{ role: 'user', content: 'Hello, this is a test. Please respond with "OK".' }],
+        max_tokens: 10
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      return res.status(400).json({
+        error: `API 请求失败: ${response.status} ${response.statusText}`,
+        details: errorData
+      });
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || 'No response';
+
+    res.json({
+      success: true,
+      message: '连接成功',
+      response: content
+    });
+  } catch (error) {
+    console.error('Error testing AI config:', error);
+    res.status(500).json({ error: `测试失败: ${error.message}` });
   }
 });
 

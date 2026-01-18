@@ -432,6 +432,166 @@ const EndpointManagement = () => {
   );
 };
 
+const AiConfigSettings = () => {
+  const [config, setConfig] = useState({
+    apiUrl: '',
+    apiKey: '',
+    model: 'gpt-3.5-turbo'
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState(null);
+
+  useEffect(() => {
+    loadConfig();
+  }, []);
+
+  const loadConfig = async () => {
+    try {
+      const response = await adminApi.getAiConfig();
+      setConfig({
+        apiUrl: response.data.apiUrl || '',
+        apiKey: response.data.apiKeyMasked || '',
+        model: response.data.model || 'gpt-3.5-turbo'
+      });
+    } catch (err) {
+      console.error('加载AI配置失败:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!config.apiUrl || !config.model) {
+      alert('API 地址和模型名称不能为空');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await adminApi.saveAiConfig(config);
+      alert('配置保存成功');
+      loadConfig();
+    } catch (err) {
+      alert(err.response?.data?.error || '保存失败');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const response = await adminApi.testAiConfig();
+      setTestResult({
+        success: true,
+        message: response.data.message,
+        response: response.data.response
+      });
+    } catch (err) {
+      setTestResult({
+        success: false,
+        message: err.response?.data?.error || '测试失败'
+      });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading-state">加载中...</div>;
+  }
+
+  return (
+    <div className="ai-config-settings card">
+      <div className="ai-config-header">
+        <h2>AI 大模型配置</h2>
+        <p className="ai-config-desc">
+          配置 OpenAI 兼容的 API，端口编程中可使用 <code>ask_ai(prompt)</code> 函数调用 AI
+        </p>
+      </div>
+
+      <div className="ai-config-form">
+        <div className="form-group">
+          <label>API 地址</label>
+          <input
+            type="text"
+            value={config.apiUrl}
+            onChange={(e) => setConfig({ ...config, apiUrl: e.target.value })}
+            placeholder="https://api.openai.com/v1/chat/completions"
+            className="form-input"
+          />
+          <span className="form-hint">支持 OpenAI 兼容的 API 地址（如 OpenAI、Azure、国内中转等）</span>
+        </div>
+
+        <div className="form-group">
+          <label>API Key</label>
+          <input
+            type="password"
+            value={config.apiKey}
+            onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
+            placeholder="sk-..."
+            className="form-input"
+          />
+          <span className="form-hint">输入新的 API Key 会覆盖原有配置</span>
+        </div>
+
+        <div className="form-group">
+          <label>模型名称</label>
+          <input
+            type="text"
+            value={config.model}
+            onChange={(e) => setConfig({ ...config, model: e.target.value })}
+            placeholder="gpt-3.5-turbo"
+            className="form-input"
+          />
+          <span className="form-hint">常用模型：gpt-3.5-turbo, gpt-4, gpt-4-turbo 等</span>
+        </div>
+
+        <div className="form-actions">
+          <button
+            className="btn btn-primary"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? '保存中...' : '保存配置'}
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={handleTest}
+            disabled={testing || !config.apiUrl}
+          >
+            {testing ? '测试中...' : '测试连接'}
+          </button>
+        </div>
+
+        {testResult && (
+          <div className={`test-result ${testResult.success ? 'success' : 'error'}`}>
+            <strong>{testResult.success ? '连接成功' : '连接失败'}</strong>
+            <p>{testResult.message}</p>
+            {testResult.response && (
+              <p className="test-response">AI 响应: {testResult.response}</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="ai-usage-guide">
+        <h3>使用说明</h3>
+        <p>配置完成后，在端口编程中可以使用以下函数：</p>
+        <pre>{`# 调用 AI 大模型
+response = ask_ai("你好，请介绍一下自己")
+# response 是字符串类型，包含 AI 的回复内容
+
+# 也可以指定 max_tokens
+response = ask_ai("写一首诗", max_tokens=500)`}</pre>
+      </div>
+    </div>
+  );
+};
+
 const Admin = () => {
   const { loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
@@ -483,6 +643,12 @@ const Admin = () => {
             首页展示
           </button>
           <button
+            className={`admin-tab ${activeTab === 'ai-config' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ai-config')}
+          >
+            AI 配置
+          </button>
+          <button
             className={`admin-tab ${activeTab === 'repositories' ? 'active' : ''}`}
             onClick={() => setActiveTab('repositories')}
           >
@@ -503,6 +669,8 @@ const Admin = () => {
         </div>
 
         {activeTab === 'showcase' && <HomeShowcaseSettings />}
+
+        {activeTab === 'ai-config' && <AiConfigSettings />}
 
         {activeTab === 'repositories' && <RepositoryManagement />}
 

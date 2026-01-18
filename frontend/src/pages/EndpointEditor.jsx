@@ -23,6 +23,11 @@ const FUNCTION_LIBRARY = {
   ],
   'API调用': [
     { name: 'get_random_quote(repo)', desc: '获取随机语句', example: 'quote = get_random_quote("诗词")' },
+    { name: 'call_endpoint(name)', desc: '调用其他端口', example: 'data = call_endpoint("my-endpoint")' },
+  ],
+  'AI 大模型': [
+    { name: 'ask_ai(prompt)', desc: '调用AI大模型', example: 'response = ask_ai("写一首诗")' },
+    { name: 'ask_ai(prompt, max_tokens)', desc: '指定最大token', example: 'response = ask_ai("写一首诗", 500)' },
   ],
   '随机数': [
     { name: 'random_int(min, max)', desc: '随机整数', example: 'num = random_int(1, 100)' },
@@ -107,6 +112,30 @@ result = {
     'content': content,
     'from': selected_repo,
     'lucky_number': random_int(1, 100)
+}`,
+  },
+  {
+    title: '示例5：调用其他端口',
+    code: `# 调用另一个端口并组合结果
+other_result = call_endpoint('daily-quote')
+
+result = {
+    'main_content': get_random_quote('主仓库'),
+    'from_other_endpoint': other_result,
+    'combined': True
+}`,
+  },
+  {
+    title: '示例6：AI生成内容',
+    code: `# 使用AI大模型生成内容（需管理员配置AI）
+quote = get_random_quote('诗词')
+prompt = f"请用现代语言解释这句诗：{quote['content']}"
+ai_response = ask_ai(prompt)
+
+result = {
+    'original': quote['content'],
+    'explanation': ai_response,
+    'generated_at': current_datetime
 }`,
   },
 ];
