@@ -55,13 +55,13 @@ const Header = () => {
 
           {/* 桌面端导航 */}
           <div className="nav-links desktop-nav">
-            <Link to="/repositories" className="nav-link">仓库</Link>
+            <Link to="/repo-list" className="nav-link">仓库</Link>
             <Link to="/endpoint-list" className="nav-link">端口</Link>
             <Link to="/api-docs" className="nav-link">文档</Link>
             {user ? (
               <>
                 <Link to="/dashboard" className="nav-link">我的仓库</Link>
-                <Link to="/endpoints" className="nav-link">我的端口</Link>
+                <Link to="/my-endpoints" className="nav-link">我的端口</Link>
                 <Link to="/api-keys" className="nav-link">API KEY</Link>
                 {!!user.isAdmin && <Link to="/admin" className="nav-link">管理</Link>}
                 <div className="nav-divider"></div>
@@ -108,7 +108,7 @@ const Header = () => {
           <div className="mobile-menu-section">
             <span className="mobile-menu-section-title">导航</span>
             <Link to="/" className="mobile-menu-link">首页</Link>
-            <Link to="/repositories" className="mobile-menu-link">仓库列表</Link>
+            <Link to="/repo-list" className="mobile-menu-link">仓库列表</Link>
             <Link to="/endpoint-list" className="mobile-menu-link">端口列表</Link>
             <Link to="/api-docs" className="mobile-menu-link">API 文档</Link>
           </div>
@@ -118,7 +118,7 @@ const Header = () => {
               <div className="mobile-menu-section">
                 <span className="mobile-menu-section-title">我的</span>
                 <Link to="/dashboard" className="mobile-menu-link">我的仓库</Link>
-                <Link to="/endpoints" className="mobile-menu-link">我的端口</Link>
+                <Link to="/my-endpoints" className="mobile-menu-link">我的端口</Link>
                 <Link to="/api-keys" className="mobile-menu-link">API KEY</Link>
                 <Link to="/change-password" className="mobile-menu-link">修改密码</Link>
                 {!!user.isAdmin && <Link to="/admin" className="mobile-menu-link">管理后台</Link>}

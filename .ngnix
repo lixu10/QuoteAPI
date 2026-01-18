@@ -1,12 +1,14 @@
 #PROXY-START/
 
-location ~ ^/(api|auth|repositories|quotes|stats|endpoints)/ {
+# 后端 API 路由
+location ~ ^/(api|auth|repositories|quotes|stats|endpoints)(/|$) {
     proxy_pass http://43.130.230.249:3077;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 }
 
+# 其他所有请求代理到前端
 location /
 {
     proxy_pass http://43.130.230.249:3088;

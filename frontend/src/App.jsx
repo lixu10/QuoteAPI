@@ -39,12 +39,12 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/repositories" element={<Repositories />} />
+          <Route path="/repo-list" element={<Repositories />} />
           <Route path="/endpoint-list" element={<EndpointList />} />
           <Route path="/api-docs" element={<ApiDocs />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/change-password" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
-          <Route path="/endpoints" element={<PrivateRoute><Endpoints /></PrivateRoute>} />
+          <Route path="/my-endpoints" element={<PrivateRoute><Endpoints /></PrivateRoute>} />
           <Route path="/endpoints/new" element={<PrivateRoute><EndpointEditor /></PrivateRoute>} />
           <Route path="/endpoints/edit/:id" element={<PrivateRoute><EndpointEditor /></PrivateRoute>} />
           <Route path="/api-keys" element={<PrivateRoute><ApiKeys /></PrivateRoute>} />

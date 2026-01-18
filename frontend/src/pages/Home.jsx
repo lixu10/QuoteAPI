@@ -115,7 +115,7 @@ const Home = () => {
                 <Link to="/register">
                   <button className="btn btn-primary btn-large">开始使用</button>
                 </Link>
-                <Link to="/repositories">
+                <Link to="/repo-list">
                   <button className="btn btn-secondary btn-large">浏览仓库</button>
                 </Link>
               </>
