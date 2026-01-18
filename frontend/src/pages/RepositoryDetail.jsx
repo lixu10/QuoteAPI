@@ -10,7 +10,7 @@ const QUOTES_PER_PAGE = 10;
 const RepositoryDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [repo, setRepo] = useState(null);
   const [quotes, setQuotes] = useState([]);
   const [stats, setStats] = useState(null);
@@ -18,19 +18,26 @@ const RepositoryDetail = () => {
   const [bulkImport, setBulkImport] = useState('');
   const [showBulkImport, setShowBulkImport] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    loadData();
-  }, [id]);
+    // 等待认证状态加载完成后再加载数据
+    if (!authLoading) {
+      loadData();
+    }
+  }, [id, authLoading, user]);
 
   const loadData = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       const [repoRes, quotesRes, statsRes] = await Promise.all([
         repositoryApi.getById(id),
         quoteApi.getByRepository(id),
-        apiService.getStats(id)
+        apiService.getStats(id).catch(() => ({ data: null })) // stats 失败不影响页面
       ]);
       setRepo(repoRes.data);
       setQuotes(quotesRes.data);
@@ -40,7 +47,18 @@ const RepositoryDetail = () => {
         setIsOwner(true);
       }
     } catch (err) {
-      alert('加载失败');
+      const status = err.response?.status;
+      const message = err.response?.data?.error;
+
+      if (status === 401) {
+        setError('此仓库需要登录或提供 API KEY 才能访问');
+      } else if (status === 403) {
+        setError('此仓库为私有，只有创建者可以访问');
+      } else if (status === 404) {
+        setError('仓库不存在');
+      } else {
+        setError(message || '加载失败');
+      }
     } finally {
       setLoading(false);
     }
@@ -93,7 +111,22 @@ const RepositoryDetail = () => {
     }
   };
 
-  if (loading) return <div className="loading">加载中...</div>;
+  const handleVisibilityChange = async (newVisibility) => {
+    try {
+      await repositoryApi.update(id, { visibility: newVisibility });
+      setRepo({ ...repo, visibility: newVisibility });
+    } catch (err) {
+      alert('修改权限失败');
+    }
+  };
+
+  const getVisibilityLabel = (visibility) => {
+    const labels = { public: '公开', restricted: '受限', private: '私有' };
+    return labels[visibility] || '公开';
+  };
+
+  if (loading || authLoading) return <div className="loading">加载中...</div>;
+  if (error) return <div className="error">{error}</div>;
   if (!repo) return <div className="error">仓库不存在</div>;
 
   const apiUrl = `${window.location.origin}/api/random/${repo.name}`;
@@ -113,8 +146,28 @@ const RepositoryDetail = () => {
     <div className="repo-detail">
       <div className="container">
         <div className="repo-header">
-          <h1>{repo.name}</h1>
+          <div className="repo-title-row">
+            <h1>{repo.name}</h1>
+            <span className={`visibility-badge visibility-${repo.visibility || 'public'}`}>
+              {getVisibilityLabel(repo.visibility)}
+            </span>
+          </div>
           <p className="repo-description">{repo.description}</p>
+
+          {isOwner && (
+            <div className="visibility-control">
+              <label>权限设置:</label>
+              <select
+                value={repo.visibility || 'public'}
+                onChange={(e) => handleVisibilityChange(e.target.value)}
+                className="visibility-select"
+              >
+                <option value="public">公开 - 任何人可访问</option>
+                <option value="restricted">受限 - 需要 API KEY</option>
+                <option value="private">私有 - 仅自己可访问</option>
+              </select>
+            </div>
+          )}
 
           <div className="repo-stats">
             <div className="stat-box">

@@ -124,3 +124,66 @@
 .endpoint-actions .btn {
   flex: 1;
 }
+
+/* Endpoint badges container */
+.endpoint-badges {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Visibility Badge */
+.visibility-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.visibility-public {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.visibility-restricted {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.visibility-private {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Visibility Control */
+.visibility-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.visibility-control label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.visibility-select {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.visibility-select:focus {
+  outline: none;
+  border-color: #1a1a1a;
+}

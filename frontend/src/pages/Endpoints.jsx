@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { endpointApi } from '../api';
+import { useAuth } from '../AuthContext';
 import { formatBeijingDate } from '../utils/timeUtils';
 import './Endpoints.css';
 
 const Endpoints = () => {
+  const { loading: authLoading } = useAuth();
   const [endpoints, setEndpoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadEndpoints();
-  }, []);
+    // 等待认证状态加载完成后再加载数据
+    if (!authLoading) {
+      loadEndpoints();
+    }
+  }, [authLoading]);
 
   const loadEndpoints = async () => {
     try {
@@ -34,6 +39,20 @@ const Endpoints = () => {
     }
   };
 
+  const handleVisibilityChange = async (id, newVisibility) => {
+    try {
+      await endpointApi.update(id, { visibility: newVisibility });
+      loadEndpoints();
+    } catch (err) {
+      alert('修改权限失败');
+    }
+  };
+
+  const getVisibilityLabel = (visibility) => {
+    const labels = { public: '公开', restricted: '受限', private: '私有' };
+    return labels[visibility] || '公开';
+  };
+
   const handleDelete = async (id) => {
     if (window.confirm('确定要删除这个端口吗？')) {
       try {
@@ -51,7 +70,7 @@ const Endpoints = () => {
     alert('API地址已复制到剪贴板');
   };
 
-  if (loading) return <div className="loading">加载中...</div>;
+  if (loading || authLoading) return <div className="loading">加载中...</div>;
 
   return (
     <div className="endpoints-page">
@@ -80,7 +99,10 @@ const Endpoints = () => {
               <div key={endpoint.id} className="endpoint-card card">
                 <div className="endpoint-header">
                   <h3>{endpoint.name}</h3>
-                  <div className="endpoint-status">
+                  <div className="endpoint-badges">
+                    <span className={`visibility-badge visibility-${endpoint.visibility || 'public'}`}>
+                      {getVisibilityLabel(endpoint.visibility)}
+                    </span>
                     <span className={`status-badge ${endpoint.is_active ? 'active' : 'inactive'}`}>
                       {endpoint.is_active ? '启用' : '禁用'}
                     </span>
@@ -102,6 +124,19 @@ const Endpoints = () => {
                       {formatBeijingDate(endpoint.created_at)}
                     </span>
                   </div>
+                </div>
+
+                <div className="visibility-control">
+                  <label>权限设置:</label>
+                  <select
+                    value={endpoint.visibility || 'public'}
+                    onChange={(e) => handleVisibilityChange(endpoint.id, e.target.value)}
+                    className="visibility-select"
+                  >
+                    <option value="public">公开 - 任何人可访问</option>
+                    <option value="restricted">受限 - 需要 API KEY</option>
+                    <option value="private">私有 - 仅自己可访问</option>
+                  </select>
                 </div>
 
                 <div className="endpoint-api">

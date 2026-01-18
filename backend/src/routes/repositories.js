@@ -103,7 +103,34 @@ router.get('/:id', (req, res, next) => {
     if (!repo) {
       return res.status(404).json({ error: '仓库不存在' });
     }
-    res.json(repo);
+
+    // 检查访问权限
+    const visibility = repo.visibility || 'public';
+    const userId = req.user?.id || req.apiKeyUser?.id;
+    const isAdmin = req.user?.isAdmin || req.apiKeyUser?.isAdmin;
+
+    // public: 任何人都可以访问
+    if (visibility === 'public') {
+      return res.json(repo);
+    }
+
+    // restricted: 需要登录或有效的 API KEY
+    if (visibility === 'restricted') {
+      if (userId) {
+        return res.json(repo);
+      }
+      return res.status(401).json({ error: '此仓库需要提供有效的 API KEY 才能访问' });
+    }
+
+    // private: 只有创建者或管理员可以访问
+    if (visibility === 'private') {
+      if (userId === repo.user_id || isAdmin) {
+        return res.json(repo);
+      }
+      return res.status(403).json({ error: '此仓库为私有，只有创建者可以访问' });
+    }
+
+    return res.status(403).json({ error: '无权访问此资源' });
   } catch (error) {
     next(error);
   }

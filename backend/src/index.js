@@ -12,7 +12,7 @@ import homeRoutes from './routes/home.js';
 import apikeyRoutes from './routes/apikeys.js';
 import adminRoutes from './routes/admin.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
-import { apiKeyMiddleware } from './middleware/auth.js';
+import { apiKeyMiddleware, optionalAuthMiddleware } from './middleware/auth.js';
 
 async function startServer() {
   try {
@@ -28,6 +28,10 @@ async function startServer() {
 
     // API KEY 中间件 - 在所有路由之前解析 API KEY
     app.use(apiKeyMiddleware);
+
+    // 可选的 JWT 解析中间件 - 尝试解析 JWT 但不强制要求
+    // 这样在不需要登录的路由上也能获取用户信息
+    app.use(optionalAuthMiddleware);
 
     app.use('/auth', authRoutes);
     app.use('/repositories', repositoryRoutes);

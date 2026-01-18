@@ -7,7 +7,7 @@
 :root {
   --primary: #000000;
   --secondary: #6e6e73;
-  --accent: #0071e3;
+  --accent: #1a1a1a;
   --bg-primary: #ffffff;
   --bg-secondary: #f5f5f7;
   --border: #d2d2d7;
@@ -27,6 +27,16 @@ body {
 
 #root {
   min-height: 100vh;
+}
+
+/* 全局链接样式 */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none;
 }
 
 .container {
@@ -52,7 +62,7 @@ body {
 }
 
 .btn-primary:hover {
-  background: #0077ed;
+  background: #333;
   transform: scale(1.02);
 }
 
@@ -102,7 +112,7 @@ body {
 
 .input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .textarea {
@@ -120,5 +130,5 @@ body {
 
 .textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }

@@ -18,6 +18,23 @@ export const authMiddleware = (req, res, next) => {
   }
 };
 
+// 可选的认证中间件 - 尝试解析 JWT 但不强制要求
+// 用于需要知道用户身份但不强制登录的路由
+export const optionalAuthMiddleware = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (token) {
+      const decoded = jwt.verify(token, config.jwtSecret);
+      req.user = decoded;
+    }
+  } catch (error) {
+    // 忽略无效 token，继续处理请求
+    // 不设置 req.user，让后续逻辑当作未登录处理
+  }
+  next();
+};
+
 // 别名，兼容旧代码
 export const authenticateToken = authMiddleware;
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { endpointApi } from '../api';
+import { useAuth } from '../AuthContext';
 import './EndpointEditor.css';
 
 // 函数库定义
@@ -113,18 +114,23 @@ result = {
 const EndpointEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { loading: authLoading } = useAuth();
   const isEdit = !!id;
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    code: ''
+    code: '',
+    visibility: 'public'
   });
   const [loading, setLoading] = useState(isEdit);
   const [showLibrary, setShowLibrary] = useState(true);
   const [activeTab, setActiveTab] = useState('editor');
 
   useEffect(() => {
+    // 等待认证状态加载完成后再加载数据
+    if (authLoading) return;
+
     if (isEdit) {
       loadEndpoint();
     } else {
@@ -134,7 +140,7 @@ const EndpointEditor = () => {
         code: EXAMPLES[0].code
       });
     }
-  }, [id]);
+  }, [id, authLoading]);
 
   const loadEndpoint = async () => {
     try {
@@ -142,7 +148,8 @@ const EndpointEditor = () => {
       setFormData({
         name: response.data.name,
         description: response.data.description || '',
-        code: response.data.code
+        code: response.data.code,
+        visibility: response.data.visibility || 'public'
       });
     } catch (err) {
       alert('加载失败');
@@ -197,7 +204,7 @@ const EndpointEditor = () => {
     }
   };
 
-  if (loading) return <div className="loading">加载中...</div>;
+  if (loading || authLoading) return <div className="loading">加载中...</div>;
 
   return (
     <div className="endpoint-editor-page">
@@ -237,6 +244,19 @@ const EndpointEditor = () => {
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="简要描述此端口的功能"
                   />
+                </div>
+
+                <div className="form-group">
+                  <label>可见性</label>
+                  <select
+                    className="select"
+                    value={formData.visibility}
+                    onChange={(e) => setFormData({ ...formData, visibility: e.target.value })}
+                  >
+                    <option value="public">公开 - 任何人可访问</option>
+                    <option value="restricted">受限 - 需要 API KEY</option>
+                    <option value="private">私有 - 仅自己可访问</option>
+                  </select>
                 </div>
               </div>
 

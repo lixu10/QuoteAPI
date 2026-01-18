@@ -18,10 +18,24 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // 只有当 401 响应明确表示 token 无效时才清除登录状态
+    // 如果是资源需要认证（如受限仓库），不应该清除 token
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      const errorMessage = error.response?.data?.error || '';
+      // 检查是否是 token 无效的错误（而不是资源需要认证）
+      const isTokenInvalid =
+        errorMessage.includes('无效的认证令牌') ||
+        errorMessage.includes('未提供认证令牌') ||
+        errorMessage.includes('token') ||
+        errorMessage.includes('令牌');
+
+      // 只有 token 本身无效时才清除登录状态
+      // 如果是 API KEY 相关的 401，不清除用户登录状态
+      if (isTokenInvalid && !errorMessage.includes('API KEY')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

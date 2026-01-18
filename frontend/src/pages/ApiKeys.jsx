@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { apiKeyApi } from '../api';
+import { useAuth } from '../AuthContext';
 import './ApiKeys.css';
 
 function ApiKeys() {
+  const { loading: authLoading } = useAuth();
   const [keys, setKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newKeyName, setNewKeyName] = useState('');
@@ -12,8 +14,11 @@ function ApiKeys() {
   const [editName, setEditName] = useState('');
 
   useEffect(() => {
-    fetchKeys();
-  }, []);
+    // 等待认证状态加载完成后再加载数据
+    if (!authLoading) {
+      fetchKeys();
+    }
+  }, [authLoading]);
 
   const fetchKeys = async () => {
     try {
@@ -86,7 +91,7 @@ function ApiKeys() {
     alert('已复制到剪贴板');
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="apikeys-page">
         <div className="container">

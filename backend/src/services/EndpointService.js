@@ -92,15 +92,15 @@ export class EndpointService {
     // 增加调用计数
     this.endpointModel.incrementCallCount(endpoint.id);
 
-    // 准备执行环境
-    const context = this.buildContext(requestData);
+    // 准备执行环境，传入端口所有者的 user_id
+    const context = this.buildContext(requestData, endpoint.user_id);
     const result = await this.runPythonCode(endpoint.code, context);
 
     return result;
   }
 
   // 构建执行上下文
-  buildContext(requestData) {
+  buildContext(requestData, endpointUserId) {
     // 使用东八区时间（UTC+8）
     const now = new Date();
     const chinaTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
@@ -127,6 +127,9 @@ export class EndpointService {
       ip_address: requestData.ip || '',
       user_agent: requestData.userAgent || '',
       referer: requestData.referer || '',
+
+      // 端口所有者ID，用于权限检查
+      endpoint_user_id: endpointUserId,
 
       // 随机数相关（通过Python的random模块）
       // 这些会在Python代码中实现
@@ -234,10 +237,11 @@ def get_random_quote(repo_name):
     """从指定仓库获取随机语句，返回包含content和link的字典"""
     try:
         url = f'http://localhost:3077/api/random/{urllib.parse.quote(repo_name)}'
-        # 创建请求并添加真实客户端IP到头部
+        # 创建请求并添加端口所有者ID到头部，用于权限检查
         req = urllib.request.Request(url)
         req.add_header('X-Forwarded-For', ip_address)
         req.add_header('User-Agent', user_agent)
+        req.add_header('X-Endpoint-User-Id', str(endpoint_user_id))
         if referer:
             req.add_header('Referer', referer)
 

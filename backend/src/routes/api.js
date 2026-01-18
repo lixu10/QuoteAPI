@@ -20,11 +20,13 @@ function checkRepoAccess(req, repo) {
     return { allowed: true };
   }
 
-  // 获取用户信息（可能来自 JWT 或 API KEY）
-  const userId = req.user?.id || req.apiKeyUser?.id;
+  // 获取用户信息（可能来自 JWT、API KEY 或端口调用）
+  // X-Endpoint-User-Id 是端口代码调用 API 时传递的端口所有者 ID
+  const endpointUserId = req.headers['x-endpoint-user-id'] ? parseInt(req.headers['x-endpoint-user-id']) : null;
+  const userId = req.user?.id || req.apiKeyUser?.id || endpointUserId;
   const isAdmin = req.user?.isAdmin || req.apiKeyUser?.isAdmin;
 
-  // restricted: 需要登录或有效的 API KEY
+  // restricted: 需要登录或有效的 API KEY 或端口调用
   if (visibility === 'restricted') {
     if (userId) {
       return { allowed: true };
@@ -36,7 +38,8 @@ function checkRepoAccess(req, repo) {
     };
   }
 
-  // private: 只有创建者可以访问
+  // private: 只有创建者或管理员可以访问
+  // 端口代码只能访问端口所有者自己的私有仓库
   if (visibility === 'private') {
     if (userId === repo.user_id || isAdmin) {
       return { allowed: true };

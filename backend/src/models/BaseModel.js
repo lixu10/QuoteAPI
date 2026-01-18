@@ -31,8 +31,17 @@ export class BaseModel {
   }
 
   update(id, data) {
-    const keys = Object.keys(data);
-    const values = Object.values(data);
+    // 过滤掉 undefined 和 null 的字段
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(([_, v]) => v !== undefined)
+    );
+
+    if (Object.keys(filteredData).length === 0) {
+      return { changes: 0 };
+    }
+
+    const keys = Object.keys(filteredData);
+    const values = Object.values(filteredData);
     const setClause = keys.map(key => `${key} = ?`).join(', ');
     const stmt = this.db.prepare(
       `UPDATE ${this.tableName} SET ${setClause} WHERE id = ?`

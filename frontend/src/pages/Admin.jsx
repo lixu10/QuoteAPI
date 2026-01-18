@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { authApi, homeShowcaseApi, adminApi } from '../api';
+import { useAuth } from '../AuthContext';
 import { formatBeijingDateTime } from '../utils/timeUtils';
 import './Admin.css';
 
@@ -432,13 +433,17 @@ const EndpointManagement = () => {
 };
 
 const Admin = () => {
+  const { loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('showcase');
 
   useEffect(() => {
-    loadUsers();
-  }, []);
+    // 等待认证状态加载完成后再加载数据
+    if (!authLoading) {
+      loadUsers();
+    }
+  }, [authLoading]);
 
   const loadUsers = async () => {
     try {
@@ -463,7 +468,7 @@ const Admin = () => {
     }
   };
 
-  if (loading) return <div className="loading">加载中...</div>;
+  if (loading || authLoading) return <div className="loading">加载中...</div>;
 
   return (
     <div className="admin">

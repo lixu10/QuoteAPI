@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { repositoryApi } from '../api';
+import { useAuth } from '../AuthContext';
 import './Dashboard.css';
 
 const Dashboard = () => {
+  const { loading: authLoading } = useAuth();
   const [repositories, setRepositories] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newRepo, setNewRepo] = useState({ name: '', description: '' });
+  const [newRepo, setNewRepo] = useState({ name: '', description: '', visibility: 'public' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadRepositories();
-  }, []);
+    // 等待认证状态加载完成后再加载数据
+    if (!authLoading) {
+      loadRepositories();
+    }
+  }, [authLoading]);
 
   const loadRepositories = async () => {
     try {
@@ -31,7 +36,7 @@ const Dashboard = () => {
     try {
       await repositoryApi.create(newRepo);
       setShowModal(false);
-      setNewRepo({ name: '', description: '' });
+      setNewRepo({ name: '', description: '', visibility: 'public' });
       loadRepositories();
     } catch (err) {
       alert(err.response?.data?.error || '创建失败');
@@ -49,7 +54,21 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) return <div className="loading">加载中...</div>;
+  const handleVisibilityChange = async (id, newVisibility) => {
+    try {
+      await repositoryApi.update(id, { visibility: newVisibility });
+      loadRepositories();
+    } catch (err) {
+      alert('修改权限失败');
+    }
+  };
+
+  const getVisibilityLabel = (visibility) => {
+    const labels = { public: '公开', restricted: '受限', private: '私有' };
+    return labels[visibility] || '公开';
+  };
+
+  if (loading || authLoading) return <div className="loading">加载中...</div>;
 
   return (
     <div className="dashboard">
@@ -66,10 +85,27 @@ const Dashboard = () => {
         <div className="repo-grid">
           {repositories.map((repo) => (
             <div key={repo.id} className="repo-card card">
-              <h3>{repo.name}</h3>
+              <div className="card-header">
+                <h3>{repo.name}</h3>
+                <span className={`visibility-badge visibility-${repo.visibility || 'public'}`}>
+                  {getVisibilityLabel(repo.visibility)}
+                </span>
+              </div>
               <p className="repo-description">{repo.description || '暂无描述'}</p>
               <div className="repo-stats">
                 <span>调用次数: {repo.api_calls}</span>
+              </div>
+              <div className="visibility-control">
+                <label>权限设置:</label>
+                <select
+                  value={repo.visibility || 'public'}
+                  onChange={(e) => handleVisibilityChange(repo.id, e.target.value)}
+                  className="visibility-select"
+                >
+                  <option value="public">公开 - 任何人可访问</option>
+                  <option value="restricted">受限 - 需要 API KEY</option>
+                  <option value="private">私有 - 仅自己可访问</option>
+                </select>
               </div>
               <div className="repo-actions">
                 <Link to={`/repository/${repo.id}`} className="btn btn-secondary">
@@ -112,6 +148,18 @@ const Dashboard = () => {
                   value={newRepo.description}
                   onChange={(e) => setNewRepo({ ...newRepo, description: e.target.value })}
                 />
+              </div>
+              <div className="form-group">
+                <label>可见性</label>
+                <select
+                  className="select"
+                  value={newRepo.visibility}
+                  onChange={(e) => setNewRepo({ ...newRepo, visibility: e.target.value })}
+                >
+                  <option value="public">公开 - 任何人可访问</option>
+                  <option value="restricted">受限 - 需要 API KEY</option>
+                  <option value="private">私有 - 仅自己可访问</option>
+                </select>
               </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-secondary">

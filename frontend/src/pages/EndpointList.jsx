@@ -63,6 +63,12 @@ function EndpointList() {
     return labels[visibility] || '公开';
   };
 
+  const copyApiUrl = (name) => {
+    const url = `${window.location.origin}/endpoints/run/${name}`;
+    navigator.clipboard.writeText(url);
+    alert('API 地址已复制到剪贴板');
+  };
+
   return (
     <div className="endpoint-list-page">
       <div className="container">
@@ -163,14 +169,12 @@ function EndpointList() {
                       {formatBeijingDateTime(endpoint.created_at)}
                     </span>
                     <div className="card-actions">
-                      <a
-                        href={`/endpoints/run/${endpoint.name}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => copyApiUrl(endpoint.name)}
                         className="btn btn-sm btn-secondary"
                       >
-                        调用
-                      </a>
+                        复制
+                      </button>
                     </div>
                   </div>
                 </div>
